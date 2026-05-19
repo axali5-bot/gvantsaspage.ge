@@ -1,0 +1,185 @@
+{
+  "en": {
+    "translation": {
+      "addToCart": "Add to Cart",
+      "nav": {
+        "home": "Home",
+        "products": "Products",
+        "about": "About Us",
+        "catalog": "Catalog",
+        "contact": "Contact"
+      },
+      "catalog": {
+        "title": "Interactive Catalogs",
+        "avon": "Avon Catalog",
+        "oriflame": "Oriflame Catalog",
+        "viewFull": "View Full Version",
+        "download": "Download PDF"
+      },
+      "search": "Search",
+      "categories": "Categories",
+      "gender": "Gender",
+      "men": "Men",
+      "women": "Women",
+      "unisex": "Unisex",
+      "all": "All",
+      "cart": "Cart",
+      "yourCart": "Your Cart",
+      "cartEmpty": "Your cart is empty",
+      "total": "Total",
+      "shippingTaxes": "Shipping and taxes calculated at checkout.",
+      "proceedToCheckout": "Proceed to Checkout",
+      "hero": {
+        "title": "Luxury Fragrances",
+        "subtitle": "Discover the essence of elegance",
+        "shop_now": "Shop Now"
+      },
+      "admin": {
+        "title": "Product Management",
+        "addNew": "Add New Product",
+        "products": "Products"
+      },
+      "filter": "Filter",
+      "price": "Price",
+      "noProducts": "No products found",
+      "checkout": {
+        "title": "Checkout",
+        "subtitle": "Complete your order details below.",
+        "fullName": "Full Name",
+        "phone": "Phone Number",
+        "address": "Delivery Address",
+        "placeOrder": "Place Order",
+        "processing": "Processing...",
+        "backToCart": "Back to cart",
+        "summary": "Order Summary",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "free": "Free",
+        "thankYou": "Thank You for Your Order!",
+        "received": "We've received your order. Our representative will contact you shortly at"
+      }
+    }
+  },
+  "ka": {
+    "translation": {
+      "addToCart": "კალათაში დამატება",
+      "nav": {
+        "home": "მთავარი",
+        "products": "პროდუქცია",
+        "about": "ჩვენ შესახებ",
+        "catalog": "კატალოგი",
+        "contact": "კონტაქტი"
+      },
+      "catalog": {
+        "title": "ინტერაქტიული კატალოგები",
+        "avon": "Avon-ის კატალოგი",
+        "oriflame": "Oriflame-ის კატალოგი",
+        "viewFull": "სრული ვერსიის ნახვა",
+        "download": "PDF-ის ჩამოტვირთვა"
+      },
+      "search": "ძიება",
+      "categories": "კატეგორიები",
+      "gender": "სქესი",
+      "men": "მამაკაცი",
+      "women": "ქალი",
+      "unisex": "უნისექსი",
+      "all": "ყველა",
+      "cart": "კალათა",
+      "yourCart": "თქვენი კალათა",
+      "cartEmpty": "თქვენი კალათა ცარიელია",
+      "total": "ჯამი",
+      "shippingTaxes": "მიწოდება და გადასახადები გამოითვლება გადახდისას.",
+      "proceedToCheckout": "შეკვეთის გაგზავნა",
+      "hero": {
+        "title": "ლუქსი არომატები",
+        "subtitle": "აღმოაჩინე ელეგანტურობის არსი",
+        "shop_now": "შეიძინე ახლა"
+      },
+      "admin": {
+        "title": "პროდუქციის მართვა",
+        "addNew": "ახალი პროდუქტის დამატება",
+        "products": "პროდუქტები"
+      },
+      "filter": "ფილტრი",
+      "price": "ფასი",
+      "noProducts": "პროდუქტი ვერ მოიძებნა",
+      "checkout": {
+        "title": "შეკვეთის გაფორმება",
+        "subtitle": "შეავსეთ მონაცემები შეკვეთის დასასრულებლად",
+        "fullName": "სახელი და გვარი",
+        "phone": "ტელეფონის ნომერი",
+        "address": "მიწოდების მისამართი",
+        "placeOrder": "შეკვეთის გაგზავნა",
+        "processing": "მუშავდება...",
+        "backToCart": "კალათაში დაბრუნება",
+        "summary": "შეკვეთის შეჯამება",
+        "subtotal": "ქვეჯამი",
+        "shipping": "მიწოდება",
+        "free": "უფასო",
+        "thankYou": "გმადლობთ შეკვეთისთვის!",
+        "received": "ჩვენ მივიღეთ თქვენი შეკვეთა. ჩვენი წარმომადგენელი მალე დაგიკავშირდებათ ნომერზე"
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "addToCart": "В корзину",
+      "nav": {
+        "home": "Главная",
+        "products": "Продукция",
+        "about": "О нас",
+        "catalog": "Каталог",
+        "contact": "Контакт"
+      },
+      "catalog": {
+        "title": "Интерактивные каталоги",
+        "avon": "Каталог Avon",
+        "oriflame": "Каталог Oriflame",
+        "viewFull": "Посмотреть полную версию",
+        "download": "Скачать PDF"
+      },
+      "search": "Поиск",
+      "categories": "Категории",
+      "gender": "Пол",
+      "men": "Мужской",
+      "women": "Женский",
+      "unisex": "Унисекс",
+      "all": "Все",
+      "cart": "Корзина",
+      "yourCart": "Ваша корзина",
+      "cartEmpty": "Ваша корзина пуста",
+      "total": "Итого",
+      "shippingTaxes": "Доставка и налоги рассчитываются при оформлении заказа.",
+      "proceedToCheckout": "Перейти к оформлению",
+      "hero": {
+        "title": "Люксовые Ароматы",
+        "subtitle": "Откройте сущность элегантности",
+        "shop_now": "Купить сейчас"
+      },
+      "admin": {
+        "title": "Управление продукцией",
+        "addNew": "Добавить продукт",
+        "products": "Продукты"
+      },
+      "filter": "Фильтр",
+      "price": "Цена",
+      "noProducts": "Продукты не найдены",
+      "checkout": {
+        "title": "Оформление заказа",
+        "subtitle": "Заполните данные для завершения заказа",
+        "fullName": "Имя и фамилия",
+        "phone": "Номер телефона",
+        "address": "Адрес доставки",
+        "placeOrder": "Отправить заказ",
+        "processing": "Обработка...",
+        "backToCart": "Вернуться в корзину",
+        "summary": "Детали заказа",
+        "subtotal": "Подытог",
+        "shipping": "Доставка",
+        "free": "Бесплатно",
+        "thankYou": "Спасибо за ваш заказ!",
+        "received": "Мы получили ваш заказ. Наш представитель свяжется с вами в ближайшее время по номеру"
+      }
+    }
+  }
+}
