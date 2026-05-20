@@ -1,37 +1,90 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import AIConsultant from "./AIConsultant";
 
 const ChatWidget = () => {
-    useEffect(() => {
-        // Prevent duplicate injection
-        if (document.getElementById("botpress-script")) return;
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
 
-        // 1. Inject the main Botpress Webchat script
+    useEffect(() => {
+        if (document.getElementById("botpress-script")) {
+            setIsLoaded(true);
+            return;
+        }
+
         const script1 = document.createElement("script");
         script1.src = "https://cdn.botpress.cloud/webchat/v3.5/inject.js";
         script1.id = "botpress-script";
         script1.async = true;
         document.body.appendChild(script1);
 
-        // 2. Inject the configuration script
         const script2 = document.createElement("script");
         script2.src = "https://files.bpcontent.cloud/2026/02/09/15/20260209154156-TK4PY2KM.js";
         script2.defer = true;
-        document.body.appendChild(script2);
+        script2.onload = () => {
+             const checkBotpress = setInterval(() => {
+                if ((window as any).botpressWebChat) {
+                    setIsLoaded(true);
+                    clearInterval(checkBotpress);
+                    
+                    (window as any).botpressWebChat.onEvent((event: any) => {
+                        if (event.type === 'ui.opened') setIsOpen(true);
+                        if (event.type === 'ui.closed') setIsOpen(false);
+                        if (event.type === 'message.received') {
+                            // Briefly simulate talking when message arrives
+                            setIsTyping(true);
+                            setTimeout(() => setIsTyping(false), 3000);
+                        }
+                    }, ['ui.opened', 'ui.closed', 'message.received']);
 
-        return () => {
-            // Cleanup: remove the scripts when component unmounts
-            // Note: Botpress might leave some global state or iframe, 
-            // but removing scripts prevents re-adding them unnecessarily.
-            // set an ID to the config script to remove it too if needed
-            if (document.body.contains(script1)) {
-                // document.body.removeChild(script1); // Usually better to keep it loaded for SPA
-            }
+                    (window as any).botpressWebChat.sendEvent({ type: 'config', layout: { showLauncher: false } });
+                }
+             }, 100);
         };
+        document.body.appendChild(script2);
     }, []);
 
-    // The official widget handles its own UI, so we return null or an empty container
-    // Ideally, we don't render anything here as the script appends to body.
-    return <div id="bp-webchat" style={{ display: 'none' }} />;
+    const toggleChat = () => {
+        const bp = (window as any).botpressWebChat;
+        if (bp) {
+            console.log("Toggling Botpress", isOpen);
+            try {
+                if (isOpen) {
+                    bp.sendEvent({ type: 'hide' });
+                    if (typeof bp.hide === 'function') bp.hide();
+                } else {
+                    bp.sendEvent({ type: 'show' });
+                    if (typeof bp.show === 'function') bp.show();
+                    // Some versions use 'open'
+                    bp.sendEvent({ type: 'open' });
+                }
+            } catch (err) {
+                console.error("Error toggling Botpress", err);
+            }
+        } else {
+            console.warn("Botpress not initialized. Retrying in 1s...");
+            // One-time fallback if it wasn't ready
+            const retry = setInterval(() => {
+                if ((window as any).botpressWebChat) {
+                    (window as any).botpressWebChat.sendEvent({ type: 'show' });
+                    clearInterval(retry);
+                }
+            }, 1000);
+            setTimeout(() => clearInterval(retry), 5000);
+        }
+    };
+
+
+
+    return (
+        <>
+            <div id="bp-webchat" />
+            {isLoaded && <AIConsultant onClick={toggleChat} isOpen={isOpen} isTalking={isTyping} />}
+        </>
+    );
 };
 
+
+
 export default ChatWidget;
+

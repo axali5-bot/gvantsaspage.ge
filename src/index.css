@@ -219,3 +219,19 @@
     animation: slide-up 1s ease-out forwards;
   }
 }
+
+/* Force hide Botpress default launcher */
+iframe#bp-webchat-container, 
+#bp-webchat-container button,
+.bp-widget-launcher {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Ensure the AI Avatar container is always on top */
+#ai-avatar-container {
+  pointer-events: auto !important;
+  z-index: 999999999 !important;
+}
