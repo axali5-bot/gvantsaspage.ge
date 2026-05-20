@@ -52,4 +52,30 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom') || id.includes('node_modules/scheduler')) {
+            return 'react-vendor';
+          }
+          if (id.includes('@supabase')) {
+            return 'supabase';
+          }
+          if (id.includes('@tanstack')) {
+            return 'query';
+          }
+          if (id.includes('framer-motion')) {
+            return 'motion';
+          }
+          if (id.includes('react-i18next') || id.includes('i18next')) {
+            return 'i18n';
+          }
+          if (id.includes('@radix-ui') || id.includes('lucide-react') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) {
+            return 'ui-vendor';
+          }
+        },
+      },
+    },
+  },
 }));

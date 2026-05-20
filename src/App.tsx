@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,11 +13,6 @@ import ProductDetails from "./pages/ProductDetails";
 import Catalog from "./pages/Catalog";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
-import AdminLayout from "./pages/admin/AdminLayout";
-import AdminProducts from "./pages/admin/AdminProducts";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminCategories from "./pages/admin/AdminCategories";
-import AdminCatalogs from "./pages/admin/AdminCatalogs";
 import { CartProvider } from "./hooks/useCart";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
@@ -24,7 +20,19 @@ import "@/i18n";
 import ChatWidget from "./components/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop";
 
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
+const AdminCatalogs = lazy(() => import("./pages/admin/AdminCatalogs"));
+
 const queryClient = new QueryClient();
+
+const AdminFallback = () => (
+  <div className="flex items-center justify-center h-64 text-muted-foreground font-body text-sm tracking-widest uppercase">
+    Loading…
+  </div>
+);
 
 const App = () => (
   <HelmetProvider>
@@ -41,19 +49,29 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
 
-                {/* New nested admin routes */}
+                {/* Lazy-loaded admin routes — NOT in customer bundle */}
                 <Route
                   element={
                     <ProtectedAdminRoute>
-                      <AdminLayout />
+                      <Suspense fallback={<AdminFallback />}>
+                        <AdminLayout />
+                      </Suspense>
                     </ProtectedAdminRoute>
                   }
                 >
                   <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
-                  <Route path="/admin/products" element={<AdminProducts />} />
-                  <Route path="/admin/orders" element={<AdminOrders />} />
-                  <Route path="/admin/categories" element={<AdminCategories />} />
-                  <Route path="/admin/catalogs" element={<AdminCatalogs />} />
+                  <Route path="/admin/products" element={
+                    <Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>
+                  } />
+                  <Route path="/admin/orders" element={
+                    <Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>
+                  } />
+                  <Route path="/admin/categories" element={
+                    <Suspense fallback={<AdminFallback />}><AdminCategories /></Suspense>
+                  } />
+                  <Route path="/admin/catalogs" element={
+                    <Suspense fallback={<AdminFallback />}><AdminCatalogs /></Suspense>
+                  } />
                 </Route>
 
                 <Route path="/about" element={<AboutUs />} />
