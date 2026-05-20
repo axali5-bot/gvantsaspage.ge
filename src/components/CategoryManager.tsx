@@ -28,11 +28,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useCategories, Category } from '@/hooks/useCategories';
+import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory, Category } from '@/hooks/useCategories';
 import { toast } from 'sonner';
 
 const CategoryManager = () => {
-  const { categories, loading, addCategory, updateCategory, deleteCategory } = useCategories();
+  const { data: categories = [], isLoading: loading } = useCategories();
+  const createCategory = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
+  const deleteCategoryMutation = useDeleteCategory();
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -61,11 +64,13 @@ const CategoryManager = () => {
 
     setSaving(true);
     try {
-      await addCategory(
-        { ka: formData.name_ka, en: formData.name_en, ru: formData.name_ru },
-        formData.slug,
-        formData.parent_id || null
-      );
+      await createCategory.mutateAsync({
+        name_ka: formData.name_ka,
+        name_en: formData.name_en,
+        name_ru: formData.name_ru,
+        slug: formData.slug,
+        parent_id: formData.parent_id || null,
+      });
       toast.success('Category added successfully');
       setAddOpen(false);
       resetForm();
@@ -97,12 +102,16 @@ const CategoryManager = () => {
 
     setSaving(true);
     try {
-      await updateCategory(
-        editingCategory.id,
-        { ka: formData.name_ka, en: formData.name_en, ru: formData.name_ru },
-        formData.slug,
-        formData.parent_id || null
-      );
+      await updateCategoryMutation.mutateAsync({
+        id: editingCategory.id,
+        patch: {
+          name_ka: formData.name_ka,
+          name_en: formData.name_en,
+          name_ru: formData.name_ru,
+          slug: formData.slug,
+          parent_id: formData.parent_id || null,
+        },
+      });
       toast.success('Category updated successfully');
       setEditOpen(false);
       setEditingCategory(null);
@@ -124,7 +133,7 @@ const CategoryManager = () => {
 
     setDeleting(true);
     try {
-      await deleteCategory(deletingCategory.id);
+      await deleteCategoryMutation.mutateAsync(deletingCategory.id);
       toast.success('Category deleted successfully');
       setDeleteOpen(false);
       setDeletingCategory(null);

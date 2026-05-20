@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 
 export interface Category {
@@ -9,86 +9,70 @@ export interface Category {
   slug: string;
   parent_id?: string | null;
   icon?: string | null;
-  game_count?: number | null;
 }
 
-export const useCategories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export interface CategoryInput {
+  name_ka: string;
+  name_en: string;
+  name_ru: string;
+  slug: string;
+  parent_id?: string | null;
+}
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
+const CATEGORIES_KEY = ['categories'] as const;
+
+export const useCategories = () => {
+  return useQuery<Category[]>({
+    queryKey: CATEGORIES_KEY,
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .order('name_ka');
-
       if (error) throw error;
-      setCategories(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch categories');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data || [];
+    },
+    staleTime: 60_000,
+  });
+};
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+export const useCreateCategory = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: CategoryInput) => {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert(input)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Category;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+  });
+};
 
-  const addCategory = async (names: { ka: string; en: string; ru: string }, slug: string, parentId?: string | null) => {
-    const { data, error } = await supabase
-      .from('categories')
-      .insert([{
-        name_ka: names.ka,
-        name_en: names.en,
-        name_ru: names.ru,
-        slug,
-        parent_id: parentId || null
-      }])
-      .select()
-      .single();
+export const useUpdateCategory = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<CategoryInput> }) => {
+      const { error } = await supabase
+        .from('categories')
+        .update(patch)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+  });
+};
 
-    if (error) throw error;
-    await fetchCategories();
-    return data;
-  };
-
-  const updateCategory = async (id: string, names: { ka: string; en: string; ru: string }, slug: string, parentId?: string | null) => {
-    const { error } = await supabase
-      .from('categories')
-      .update({
-        name_ka: names.ka,
-        name_en: names.en,
-        name_ru: names.ru,
-        slug,
-        parent_id: parentId || null
-      })
-      .eq('id', id);
-
-    if (error) throw error;
-    await fetchCategories();
-  };
-
-  const deleteCategory = async (id: string) => {
-    const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    await fetchCategories();
-  };
-
-  return {
-    categories,
-    loading,
-    error,
-    refetch: fetchCategories,
-    addCategory,
-    updateCategory,
-    deleteCategory
-  };
+export const useDeleteCategory = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('categories').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+  });
 };

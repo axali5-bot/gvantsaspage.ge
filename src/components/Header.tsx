@@ -50,7 +50,7 @@ export const Header = ({ onSearch }: HeaderProps) => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
 
-  const { categories } = useCategories();
+  const { data: categories = [] } = useCategories();
   const parentCategories = categories.filter(c => !c.parent_id);
 
   const navigate = useNavigate();

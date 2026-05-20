@@ -10,7 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { useCategories, Category } from '@/hooks/useCategories';
+import { useCreateCategory, Category } from '@/hooks/useCategories';
 import { toast } from 'sonner';
 
 interface QuickAddCategoryProps {
@@ -20,7 +20,7 @@ interface QuickAddCategoryProps {
 }
 
 const QuickAddCategory = ({ parentId, onSuccess, label = "Add New" }: QuickAddCategoryProps) => {
-    const { addCategory } = useCategories();
+    const createCategory = useCreateCategory();
     const [open, setOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -43,17 +43,17 @@ const QuickAddCategory = ({ parentId, onSuccess, label = "Add New" }: QuickAddCa
 
         setSaving(true);
         try {
-            const newCategory = await addCategory(
-                { ka: formData.name_ka, en: formData.name_en, ru: formData.name_ru },
-                formData.slug,
-                parentId || null
-            );
+            const newCategory = await createCategory.mutateAsync({
+                name_ka: formData.name_ka,
+                name_en: formData.name_en,
+                name_ru: formData.name_ru,
+                slug: formData.slug,
+                parent_id: parentId || null,
+            });
             toast.success('Category added successfully');
             setOpen(false);
             resetForm();
-            if (newCategory) {
-                onSuccess(newCategory);
-            }
+            onSuccess(newCategory);
         } catch (err: any) {
             toast.error(err.message || 'Failed to add category');
         } finally {
