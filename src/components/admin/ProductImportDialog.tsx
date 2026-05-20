@@ -5,6 +5,7 @@ import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { useQueryClient } from '@tanstack/react-query';
+import type { TablesInsert } from '@/types/supabase';
 
 interface Props {
   open: boolean;
@@ -63,7 +64,7 @@ export const ProductImportDialog = ({ open, onOpenChange }: Props) => {
           stock_quantity: parseInt(row.stock_quantity) || 0,
           image_url: row.image_url || null,
           gender: row.gender || 'Unisex',
-        }] as any);
+        } satisfies TablesInsert<'products'>]);
         if (error) { fail++; } else { ok++; }
       }
 
