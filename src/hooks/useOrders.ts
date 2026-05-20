@@ -1,78 +1,67 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 
 export interface OrderItem {
-    id: string;
-    order_id: string;
-    product_id: string;
-    quantity: number;
-    price_at_time: number;
-    products?: {
-        name_en?: string;
-        name_ka?: string;
-        name_ru?: string;
-        name?: string;
-        brand: string;
-        image_url: string;
-    };
+  id: string;
+  order_id: string | null;
+  product_id: string | null;
+  quantity: number;
+  price_at_time: number;
+  products?: {
+    name_ka?: string;
+    name_en?: string;
+    name_ru?: string;
+    image_url?: string | null;
+  };
 }
 
 export interface Order {
-    id: string;
-    customer_email?: string;
-    customer_name?: string;
-    customer_phone?: string;
-    customer_address?: string;
-    total_price: number;
-    status: 'pending' | 'processing' | 'completed' | 'cancelled';
-    created_at: string;
-    order_items?: OrderItem[];
+  id: string;
+  customer_email?: string | null;
+  customer_name?: string | null;
+  customer_phone?: string | null;
+  customer_address?: string | null;
+  total_price: number;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
+  created_at: string | null;
+  order_items?: OrderItem[];
 }
 
+const ORDERS_KEY = ['orders'] as const;
+
 export const useOrders = () => {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  return useQuery<Order[]>({
+    queryKey: ORDERS_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*, products(*))')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data as unknown as Order[]) || [];
+    },
+    staleTime: 15_000,
+  });
+};
 
-    const fetchOrders = async () => {
-        try {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*, order_items(*, products(*))')
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            setOrders((data as unknown as Order[]) || []);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch orders');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const updateOrderStatus = async (orderId: string, status: Order['status']) => {
-        try {
-            const { error } = await supabase
-                .from('orders')
-                .update({ status })
-                .eq('id', orderId);
-
-            if (error) throw error;
-
-            setOrders(prev => prev.map(order =>
-                order.id === orderId ? { ...order, status } : order
-            ));
-
-            return { success: true };
-        } catch (err) {
-            return { success: false, error: err instanceof Error ? err.message : 'Failed to update order' };
-        }
-    };
-
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
-    return { orders, loading, error, refreshOrders: fetchOrders, updateOrderStatus };
+export const useUpdateOrderStatus = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: Order['status'] }) => {
+      const { error } = await supabase.from('orders').update({ status }).eq('id', id);
+      if (error) throw error;
+    },
+    onMutate: async ({ id, status }) => {
+      await qc.cancelQueries({ queryKey: ORDERS_KEY });
+      const prev = qc.getQueryData<Order[]>(ORDERS_KEY);
+      qc.setQueryData<Order[]>(ORDERS_KEY, (old) =>
+        (old || []).map((o) => (o.id === id ? { ...o, status } : o))
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(ORDERS_KEY, ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ORDERS_KEY }),
+  });
 };

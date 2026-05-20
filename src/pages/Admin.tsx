@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
-import { useOrders } from '@/hooks/useOrders';
+import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
 import CategoryManager from '@/components/CategoryManager';
@@ -52,15 +52,10 @@ const OrderRow = ({ order, updateOrderStatus }: { order: any, updateOrderStatus:
   const handleSaveStatus = async () => {
     setSaving(true);
     try {
-      const result = await updateOrderStatus(order.id, rowStatus);
-      if (result.success) {
-        toast.success("Order status updated");
-      } else {
-        toast.error("Failed to update status");
-        setRowStatus(order.status); // reset on error
-      }
-    } catch (err) {
-      toast.error("An unexpected error occurred");
+      await updateOrderStatus({ id: order.id, status: rowStatus });
+      toast.success("Order status updated");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update status");
       setRowStatus(order.status);
     } finally {
       setSaving(false);
@@ -201,7 +196,8 @@ const Admin = () => {
   // @ts-expect-error — Admin.tsx is replaced in Phase 2 Step 9; temporary shim
   const { data: products = [], isLoading: loading, error } = useProducts();
   const { data: categories = [] } = useCategories();
-  const { orders, loading: ordersLoading, error: ordersError, updateOrderStatus } = useOrders();
+  const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useOrders();
+  const updateOrderStatusMutation = useUpdateOrderStatus();
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -1344,7 +1340,7 @@ const Admin = () => {
                     ) : ordersError ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-20 text-red-500 font-body">
-                          Error: {ordersError}
+                          Error: {ordersError?.message}
                         </TableCell>
                       </TableRow>
                     ) : orders?.length === 0 ? (
@@ -1358,7 +1354,7 @@ const Admin = () => {
                         <OrderRow
                           key={order.id}
                           order={order}
-                          updateOrderStatus={updateOrderStatus}
+                          updateOrderStatus={updateOrderStatusMutation.mutateAsync}
                         />
                       ))
                     )}
