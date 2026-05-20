@@ -14,8 +14,8 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
 
-  const { products, loading, error } = useProducts();
-  const { categories, loading: categoriesLoading } = useCategories();
+  const { data: products = [], isLoading: loading, error } = useProducts();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -144,7 +144,7 @@ const Index = () => {
           </div>
         ) : error ? (
           <div className="py-20 text-center">
-            <p className="font-body text-destructive">{error}</p>
+            <p className="font-body text-destructive">{error.message}</p>
           </div>
         ) : (
           <ProductGrid products={filteredProducts} />

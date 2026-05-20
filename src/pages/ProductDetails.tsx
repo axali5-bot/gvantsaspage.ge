@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { product, loading, error } = useProduct(id);
+    const { data: product, isLoading: loading, error } = useProduct(id);
     const { addToCart } = useCart();
     const { t, i18n } = useTranslation();
 
@@ -45,7 +45,7 @@ const ProductDetails = () => {
             <div className="min-h-screen bg-background">
                 <Header onSearch={() => { }} />
                 <div className="container mx-auto px-4 py-20 text-center">
-                    <p className="font-body text-destructive mb-4">{error || "Product not found"}</p>
+                    <p className="font-body text-destructive mb-4">{error?.message || "Product not found"}</p>
                     <Button onClick={() => navigate('/')} variant="outline">
                         Back to Shop
                     </Button>

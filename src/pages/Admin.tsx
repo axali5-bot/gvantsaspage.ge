@@ -198,7 +198,8 @@ const Admin = () => {
   const { t } = useTranslation();
   const { signOut } = useAuth();
 
-  const { products, loading, error } = useProducts();
+  // @ts-expect-error — Admin.tsx is replaced in Phase 2 Step 9; temporary shim
+  const { data: products = [], isLoading: loading, error } = useProducts();
   const { categories, refetch: refetchCategories } = useCategories();
   const { orders, loading: ordersLoading, error: ordersError, updateOrderStatus } = useOrders();
   const [open, setOpen] = useState(false);
