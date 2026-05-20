@@ -67,7 +67,7 @@ export const HeroSection = () => {
   return (
     <div
       ref={containerRef}
-      className="relative h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden bg-black selection:bg-amber-500/20 mb-8 md:mb-20"
+      className="relative h-[50vh] sm:h-[65vh] md:h-[85vh] w-full overflow-hidden bg-black selection:bg-gold/20 mb-8 md:mb-20"
     >
       {/* Layer 1: Parallax Background Image */}
       <motion.div
@@ -142,12 +142,12 @@ export const HeroSection = () => {
 
                 {/* Stylized Underline */}
                 <div className="mt-3 md:mt-6 relative h-[1px] md:h-[2px] w-full max-w-[200px] md:max-w-[500px] mx-auto overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose-500/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
                   <motion.div
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-rose-300 to-transparent"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-gold to-transparent"
                   />
                 </div>
               </div>
