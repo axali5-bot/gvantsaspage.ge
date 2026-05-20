@@ -197,7 +197,7 @@ export const ProductCard = ({ product, index }: ProductCardProps) => {
               {localizedName}
             </h3>
           </Link>
-          <p className="font-body text-sm font-bold text-foreground mt-auto tracking-wider group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-rose-700 group-hover:via-pink-600 group-hover:to-rose-700 transition-all duration-500 group-hover:scale-110">
+          <p className="font-body text-sm font-bold text-gold mt-auto tracking-wider transition-all duration-500 group-hover:scale-110 group-hover:text-gold-deep">
             {product.price} ₾
           </p>
         </div>

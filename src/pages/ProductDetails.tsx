@@ -115,10 +115,10 @@ const ProductDetails = () => {
                                 {localizedName}
                             </h1>
                             <div className="flex items-center gap-4">
-                                <p className="font-display text-2xl md:text-4xl text-rose-600 font-light">
+                                <p className="font-display text-2xl md:text-4xl text-gold font-light">
                                     {product.price} ₾
                                 </p>
-                                <div className="h-[1px] flex-1 bg-gradient-to-r from-rose-200/50 to-transparent" />
+                                <div className="h-[1px] flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                             </div>
                         </div>
 
