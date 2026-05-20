@@ -47,6 +47,11 @@
 
     --font-display: 'Cormorant Garamond', serif;
     --font-body: 'Montserrat', sans-serif;
+
+    --gold: 43 65% 53%;
+    --gold-soft: 43 55% 68%;
+    --gold-deep: 43 75% 38%;
+    --gold-foreground: 30 15% 10%;
   }
 
   .dark {
@@ -86,6 +91,11 @@
     --sidebar-accent-foreground: 30 20% 90%;
     --sidebar-border: 330 10% 20%;
     --sidebar-ring: 330 80% 65%;
+
+    --gold: 43 65% 53%;
+    --gold-soft: 43 55% 68%;
+    --gold-deep: 43 75% 38%;
+    --gold-foreground: 30 15% 10%;
   }
 }
 
