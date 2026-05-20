@@ -75,8 +75,9 @@ const AboutUs = () => {
                 >
                     <div className="absolute inset-0 bg-black/40 z-10" />
                     <img
-                        src="/luxury_perfume_bg.png"
+                        src="/luxury_perfume_bg.webp"
                         alt="Luxury Perfume"
+                        loading="lazy"
                         className="w-full h-full object-cover"
                     />
                 </motion.div>
@@ -149,8 +150,9 @@ const AboutUs = () => {
                             >
                                 <div className="absolute inset-0 bg-gold/10 group-hover:bg-transparent transition-colors duration-700" />
                                 <img
-                                    src="/about_narrative.jpg"
+                                    src="/about_narrative.webp"
                                     alt="Fragrance details"
+                                    loading="lazy"
                                     className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
                                 />
                             </motion.div>

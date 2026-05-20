@@ -91,9 +91,10 @@ const AIConsultant = ({ onClick, isOpen, isTalking: isBotTalking }: AIConsultant
 
                 {/* Character Image */}
                 <div className="w-40 h-40 md:w-52 md:h-52 relative">
-                    <img 
-                        src="/ai-consultant.png" 
+                    <img
+                        src="/ai-consultant.webp"
                         alt="AI Consultant"
+                        loading="lazy"
                         className="w-full h-full object-contain"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;

@@ -80,7 +80,7 @@ export const HeroSection = () => {
       >
         <div className="absolute inset-0 bg-black/40 z-10" /> {/* Slightly darker overlay for mobile legibility */}
         <img
-          src="/images/perfume-collection-hero.jpg"
+          src="/images/perfume-collection-hero.webp"
           alt="Premium Perfume Collection"
           className="w-full h-full object-cover object-center brightness-90 transition-all duration-1000"
         />
