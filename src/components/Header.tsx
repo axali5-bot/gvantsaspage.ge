@@ -116,9 +116,9 @@ export const Header = ({ onSearch }: HeaderProps) => {
           >
             <a href="/" onClick={handleHomeClick} className="flex flex-col group">
               <h1 className="font-display text-2xl md:text-3xl font-light tracking-[0.3em] text-foreground transition-all duration-500 group-hover:tracking-[0.4em] group-hover:text-rose-600">
-                AVON<span className="font-semibold text-rose-500/80 group-hover:text-rose-600">2</span>FLAME
+                AVON<span className="font-semibold text-gold group-hover:text-gold-deep transition-colors duration-300">2</span>FLAME
               </h1>
-              <div className="h-[1px] w-0 bg-rose-500/30 transition-all duration-700 group-hover:w-full" />
+              <div className="h-[1px] w-0 bg-gold/30 transition-all duration-700 group-hover:w-full" />
             </a>
           </motion.div>
 

@@ -24,7 +24,7 @@ export const CartSheet = () => {
                 <button className="relative p-2 hover:text-accent transition-colors">
                     <ShoppingBag size={20} />
                     {totalItems > 0 && (
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] rounded-full flex items-center justify-center font-body shadow-[0_0_10px_rgba(225,29,72,0.4)]">
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-gold text-gold-foreground text-[10px] rounded-full flex items-center justify-center font-body shadow-[0_0_10px_rgba(212,175,55,0.5)]">
                             {totalItems}
                         </span>
                     )}
