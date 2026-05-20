@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, Plus, Upload, X, Pencil, Trash2, Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Download, FileText, FileSpreadsheet, FileUp, Package, Clock, CheckCircle, Ban, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -195,11 +196,7 @@ const OrderRow = ({ order, updateOrderStatus }: { order: any, updateOrderStatus:
 
 const Admin = () => {
   const { t } = useTranslation();
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('admin_auth') === 'true';
-  });
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [loginError, setLoginError] = useState(false);
+  const { signOut } = useAuth();
 
   const { products, loading, error } = useProducts();
   const { categories, refetch: refetchCategories } = useCategories();
@@ -903,73 +900,6 @@ const Admin = () => {
     </>
   );
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loginData.username === 'admin' && loginData.password === 'avon2flame2024') {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('admin_auth', 'true');
-      setLoginError(false);
-      toast.success('Welcome back, Admin');
-    } else {
-      setLoginError(true);
-      toast.error('Invalid credentials');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('admin_auth');
-    toast.info('Logged out');
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-8 bg-card p-8 rounded-sm border border-border shadow-2xl">
-          <div className="text-center">
-            <h1 className="font-display text-3xl font-semibold tracking-wider mb-2">AVON2FLAME</h1>
-            <p className="font-body text-sm text-muted-foreground uppercase tracking-widest">Admin Portal</p>
-          </div>
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                value={loginData.username}
-                onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
-                className="bg-background border-border focus:ring-primary"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                className="bg-background border-border focus:ring-primary"
-                required
-              />
-            </div>
-            {loginError && (
-              <p className="text-xs text-destructive text-center font-body">Invalid username or password</p>
-            )}
-            <Button type="submit" className="w-full h-12 uppercase tracking-widest text-xs">
-              Access Dashboard
-            </Button>
-          </form>
-          <div className="text-center pt-4">
-            <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">
-              <ArrowLeft size={12} /> Back to Store
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Admin Header */}
@@ -986,7 +916,7 @@ const Admin = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs text-muted-foreground hover:text-destructive">
+            <Button variant="ghost" size="sm" onClick={() => signOut()} className="text-xs text-muted-foreground hover:text-destructive">
               Logout
             </Button>
             <Dialog open={open} onOpenChange={(isOpen) => {
