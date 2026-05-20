@@ -164,7 +164,7 @@ const Checkout = () => {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full h-14 uppercase tracking-[0.2em] text-[11px] font-body bg-gradient-to-r from-rose-200 via-pink-400 to-rose-200 text-black hover:from-rose-300 hover:via-pink-500 hover:to-rose-300 transition-all duration-500 rounded-none border border-rose-500/30 shadow-[0_0_20px_rgba(225,29,72,0.15)] hover:shadow-[0_0_30px_rgba(225,29,72,0.3)] font-semibold"
+                                className="w-full h-14 uppercase tracking-[0.2em] text-[11px] font-body bg-gradient-to-r from-gold-deep via-gold to-gold-soft text-gold-foreground hover:from-gold hover:via-gold-soft hover:to-gold transition-all duration-500 rounded-none border border-gold/40 shadow-[0_0_20px_rgba(212,175,55,0.25)] hover:shadow-[0_0_35px_rgba(212,175,55,0.45)] font-semibold"
                             >
                                 {isSubmitting ? t('checkout.processing') : `${t('checkout.placeOrder')} — ${totalPrice} ₾`}
                             </Button>
