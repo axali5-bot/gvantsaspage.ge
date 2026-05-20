@@ -47,11 +47,9 @@ const Checkout = () => {
                 p_customer_name: formData.name,
                 p_customer_phone: formData.phone,
                 p_customer_address: formData.address,
-                p_total_amount: totalPrice,
                 p_items: cart.map(item => ({
                     product_id: item.id,
-                    quantity: item.quantity,
-                    price_at_time: item.price
+                    quantity: item.quantity
                 }))
             });
 
