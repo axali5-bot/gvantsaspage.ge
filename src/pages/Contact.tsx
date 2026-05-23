@@ -136,13 +136,13 @@ const Contact = () => {
                         >
                             <p className="text-[11px] uppercase tracking-[0.4em] text-rose-300 mb-8 font-medium">{txt.followUs}</p>
                             <div className="flex justify-center gap-6">
-                                <button className="w-14 h-14 rounded-full bg-white border border-rose-100 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-500 shadow-sm">
+                                <a href="https://www.instagram.com/avon2flame" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-full bg-white border border-rose-100 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-500 shadow-sm">
                                     <Instagram size={24} />
-                                </button>
-                                <button className="w-14 h-14 rounded-full bg-white border border-rose-100 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-500 shadow-sm">
+                                </a>
+                                <a href="https://www.facebook.com/avon2flame" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-full bg-white border border-rose-100 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-500 shadow-sm">
                                     <Facebook size={24} />
-                                </button>
-                            </div>
+                                </a>
+            </div>
                         </motion.div>
                     </div>
                 </div>

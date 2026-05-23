@@ -1,6 +1,6 @@
 import { useOrders } from '@/hooks/useOrders';
 import { OrderRow } from '@/components/admin/OrderRow';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export const AdminOrders = () => {
   const { data: orders = [], isLoading, error } = useOrders();
