@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface OrderItem {
   id: string;
@@ -24,6 +25,7 @@ export interface Order {
   total_price: number;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   created_at: string | null;
+  user_id?: string | null;
   order_items?: OrderItem[];
 }
 
@@ -40,6 +42,25 @@ export const useOrders = () => {
       if (error) throw error;
       return (data as unknown as Order[]) || [];
     },
+    staleTime: 15_000,
+  });
+};
+
+export const useCustomerOrders = () => {
+  const { user } = useAuth();
+  return useQuery<Order[]>({
+    queryKey: ['customer-orders', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*, products(name_ka, name_en, name_ru, image_url))')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data as unknown as Order[]) || [];
+    },
+    enabled: !!user,
     staleTime: 15_000,
   });
 };

@@ -161,6 +161,7 @@ export type Database = {
           id: string
           status: string | null
           total_price: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -171,6 +172,7 @@ export type Database = {
           id?: string
           status?: string | null
           total_price: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -181,6 +183,7 @@ export type Database = {
           id?: string
           status?: string | null
           total_price?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -235,26 +238,32 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          default_address: string | null
           email: string
           full_name: string | null
           id: string
           is_admin: boolean
+          phone: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          default_address?: string | null
           email: string
           full_name?: string | null
           id: string
           is_admin?: boolean
+          phone?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          default_address?: string | null
           email?: string
           full_name?: string | null
           id?: string
           is_admin?: boolean
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -270,6 +279,7 @@ export type Database = {
           p_customer_name: string
           p_customer_phone: string
           p_items: Json
+          p_user_id?: string | null
         }
         Returns: string
       }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,15 +16,28 @@ import { trackPurchase } from "@/utils/analytics";
 
 const Checkout = () => {
     const { cart, totalPrice, clearCart } = useCart();
+    const { user, profile, refreshProfile } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [isOrdered, setIsOrdered] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [saveAddress, setSaveAddress] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
         address: "",
     });
+
+    // Pre-fill form from profile if logged in
+    useEffect(() => {
+        if (profile) {
+            setFormData({
+                name: profile.full_name ?? "",
+                phone: profile.phone ?? "",
+                address: profile.default_address ?? "",
+            });
+        }
+    }, [profile]);
 
     if (cart.length === 0 && !isOrdered) {
         return (
@@ -42,7 +56,6 @@ const Checkout = () => {
         try {
             setIsSubmitting(true);
 
-            // Perform RPC call to create order and items in one transaction
             const { error: rpcError } = await supabase.rpc('create_order', {
                 p_customer_name: formData.name,
                 p_customer_phone: formData.phone,
@@ -50,14 +63,23 @@ const Checkout = () => {
                 p_items: cart.map(item => ({
                     product_id: item.id,
                     quantity: item.quantity
-                }))
+                })),
+                p_user_id: user?.id ?? null,
             });
 
             if (rpcError) throw rpcError;
 
+            // Save address to profile if checkbox ticked and user is logged in
+            if (saveAddress && user) {
+                await supabase
+                    .from('profiles')
+                    .update({ default_address: formData.address, updated_at: new Date().toISOString() })
+                    .eq('id', user.id);
+                await refreshProfile();
+            }
+
             setIsOrdered(true);
 
-            // Track Purchase
             trackPurchase({
                 total_amount: totalPrice,
                 items: cart.map(item => ({

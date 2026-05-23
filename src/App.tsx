@@ -13,12 +13,17 @@ import ProductDetails from "./pages/ProductDetails";
 import Catalog from "./pages/Catalog";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
+import Signup from "./pages/auth/Signup";
+import Login from "./pages/auth/Login";
 import { CartProvider } from "./hooks/useCart";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { ProtectedCustomerRoute } from "./components/ProtectedCustomerRoute";
 import "@/i18n";
 import ChatWidget from "./components/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop";
+
+const Account = lazy(() => import("./pages/Account"));
 
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
@@ -71,6 +76,17 @@ const App = () => (
                   } />
                   <Route path="/admin/catalogs" element={
                     <Suspense fallback={<AdminFallback />}><AdminCatalogs /></Suspense>
+                  } />
+                </Route>
+
+                {/* Auth routes */}
+                <Route path="/auth/signup" element={<Signup />} />
+                <Route path="/auth/login" element={<Login />} />
+
+                {/* Protected customer routes */}
+                <Route element={<ProtectedCustomerRoute />}>
+                  <Route path="/account" element={
+                    <Suspense fallback={<AdminFallback />}><Account /></Suspense>
                   } />
                 </Route>
 

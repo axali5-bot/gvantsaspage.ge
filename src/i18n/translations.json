@@ -57,6 +57,38 @@
         "free": "Free",
         "thankYou": "Thank You for Your Order!",
         "received": "We've received your order. Our representative will contact you shortly at"
+      },
+      "auth": {
+        "signup_title": "Create Account",
+        "login_title": "Welcome Back",
+        "email": "Email",
+        "password": "Password",
+        "full_name": "Full Name",
+        "phone": "Phone Number",
+        "signup_button": "Create Account",
+        "login_button": "Sign In",
+        "have_account": "Already have an account?",
+        "no_account": "Don't have an account?",
+        "welcome": "Welcome to AVON2FLAME!",
+        "save_address": "Save this address to my profile"
+      },
+      "account": {
+        "title": "My Account",
+        "my_orders": "My Orders",
+        "logout": "Sign Out",
+        "save_address": "Save address to profile",
+        "profile_updated": "Profile updated successfully",
+        "orders_coming_soon": "Order history coming soon",
+        "edit_profile": "Edit Profile",
+        "save": "Save Changes"
+      },
+      "header": {
+        "login": "Sign In",
+        "signup": "Register",
+        "my_account": "My Account",
+        "my_orders": "My Orders",
+        "admin_panel": "Admin Panel",
+        "logout": "Sign Out"
       }
     }
   },
@@ -118,6 +150,38 @@
         "free": "უფასო",
         "thankYou": "გმადლობთ შეკვეთისთვის!",
         "received": "ჩვენ მივიღეთ თქვენი შეკვეთა. ჩვენი წარმომადგენელი მალე დაგიკავშირდებათ ნომერზე"
+      },
+      "auth": {
+        "signup_title": "ანგარიშის შექმნა",
+        "login_title": "კეთილი იყოს თქვენი დაბრუნება",
+        "email": "ელ-ფოსტა",
+        "password": "პაროლი",
+        "full_name": "სახელი და გვარი",
+        "phone": "ტელეფონის ნომერი",
+        "signup_button": "ანგარიშის შექმნა",
+        "login_button": "შესვლა",
+        "have_account": "უკვე გაქვთ ანგარიში?",
+        "no_account": "არ გაქვთ ანგარიში?",
+        "welcome": "მოგესალმებით AVON2FLAME-ში!",
+        "save_address": "მისამართის შენახვა ჩემს პროფილში"
+      },
+      "account": {
+        "title": "ჩემი ანგარიში",
+        "my_orders": "ჩემი შეკვეთები",
+        "logout": "გასვლა",
+        "save_address": "მისამართის პროფილში შენახვა",
+        "profile_updated": "პროფილი განახლდა",
+        "orders_coming_soon": "შეკვეთების ისტორია მალე იქნება ხელმისაწვდომი",
+        "edit_profile": "პროფილის რედაქტირება",
+        "save": "შენახვა"
+      },
+      "header": {
+        "login": "შესვლა",
+        "signup": "რეგისტრაცია",
+        "my_account": "ჩემი ანგარიში",
+        "my_orders": "ჩემი შეკვეთები",
+        "admin_panel": "ადმინ პანელი",
+        "logout": "გასვლა"
       }
     }
   },
@@ -179,6 +243,38 @@
         "free": "Бесплатно",
         "thankYou": "Спасибо за ваш заказ!",
         "received": "Мы получили ваш заказ. Наш представитель свяжется с вами в ближайшее время по номеру"
+      },
+      "auth": {
+        "signup_title": "Создать аккаунт",
+        "login_title": "С возвращением",
+        "email": "Эл. почта",
+        "password": "Пароль",
+        "full_name": "Имя и фамилия",
+        "phone": "Номер телефона",
+        "signup_button": "Создать аккаунт",
+        "login_button": "Войти",
+        "have_account": "Уже есть аккаунт?",
+        "no_account": "Нет аккаунта?",
+        "welcome": "Добро пожаловать в AVON2FLAME!",
+        "save_address": "Сохранить адрес в профиле"
+      },
+      "account": {
+        "title": "Мой аккаунт",
+        "my_orders": "Мои заказы",
+        "logout": "Выйти",
+        "save_address": "Сохранить адрес в профиле",
+        "profile_updated": "Профиль обновлён",
+        "orders_coming_soon": "История заказов скоро будет доступна",
+        "edit_profile": "Редактировать профиль",
+        "save": "Сохранить"
+      },
+      "header": {
+        "login": "Войти",
+        "signup": "Регистрация",
+        "my_account": "Мой аккаунт",
+        "my_orders": "Мои заказы",
+        "admin_panel": "Панель администратора",
+        "logout": "Выйти"
       }
     }
   }
