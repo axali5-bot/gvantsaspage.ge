@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,8 +24,7 @@ const Account = () => {
     default_address: profile?.default_address ?? '',
   });
 
-  // Sync form when profile loads
-  useState(() => {
+  useEffect(() => {
     if (profile) {
       setForm({
         full_name: profile.full_name ?? '',
@@ -33,7 +32,7 @@ const Account = () => {
         default_address: profile.default_address ?? '',
       });
     }
-  });
+  }, [profile]);
 
   const handleSave = async () => {
     if (!user) return;

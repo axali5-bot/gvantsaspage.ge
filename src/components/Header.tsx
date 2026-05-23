@@ -8,7 +8,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartSheet } from './CartSheet';
 import { useCategories } from '@/hooks/useCategories';
 import UserMenu from './UserMenu';
-import { useAuth } from '@/hooks/useAuth';
 
 const languages = [
   { code: 'ka', label: 'ქარ' },
@@ -46,7 +45,6 @@ const NavLink = ({ children, onClick, to, delay, hasDropdown }: { children: Reac
 
 export const Header = ({ onSearch }: HeaderProps) => {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
   const isKa = i18n.language === 'ka';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
