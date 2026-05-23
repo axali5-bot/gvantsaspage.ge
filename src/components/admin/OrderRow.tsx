@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -15,6 +15,10 @@ export const OrderRow = ({ order }: Props) => {
   const updateStatus = useUpdateOrderStatus();
   const [rowStatus, setRowStatus] = useState<Order['status']>(order.status || 'pending');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setRowStatus(order.status || 'pending');
+  }, [order.status]);
 
   const handleSave = async () => {
     setSaving(true);

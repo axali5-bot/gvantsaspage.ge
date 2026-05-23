@@ -29,7 +29,7 @@ export interface ProductInput {
   description_en?: string;
   description_ru?: string;
   price: number;
-  image_url: string;
+  image_url?: string | null;
   category_id: string | null;
   stock_quantity: number;
   gender?: string;
@@ -37,8 +37,8 @@ export interface ProductInput {
 
 const PRODUCTS_KEY = ['products'] as const;
 
-const localize = (row: any): Product => ({
-  ...row,
+const localize = (row: Partial<Product> & Record<string, unknown>): Product => ({
+  ...(row as Product),
   name: row.name_ka || row.name_en || row.name_ru || '',
   description: row.description_ka || row.description_en || row.description_ru || '',
 });

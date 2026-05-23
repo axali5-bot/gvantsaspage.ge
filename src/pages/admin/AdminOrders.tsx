@@ -23,21 +23,21 @@ export const AdminOrders = () => {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <td colSpan={5} className="text-center py-12 text-muted-foreground font-body">
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground font-body">
                   Loading orders...
-                </td>
+                </TableCell>
               </TableRow>
             ) : error ? (
               <TableRow>
-                <td colSpan={5} className="text-center py-12 text-destructive font-body">
+                <TableCell colSpan={5} className="text-center py-12 text-destructive font-body">
                   {error.message}
-                </td>
+                </TableCell>
               </TableRow>
             ) : orders.length === 0 ? (
               <TableRow>
-                <td colSpan={5} className="text-center py-12 text-muted-foreground font-body">
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground font-body">
                   No orders yet.
-                </td>
+                </TableCell>
               </TableRow>
             ) : (
               orders.map((order) => <OrderRow key={order.id} order={order} />)

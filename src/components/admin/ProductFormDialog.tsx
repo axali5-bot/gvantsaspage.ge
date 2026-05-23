@@ -10,6 +10,25 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { useCreateProduct, useUpdateProduct, Product, ProductInput } from '@/hooks/useProducts';
 import { Category } from '@/hooks/useCategories';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const formSchema = z.object({
+  name_ka: z.string().min(1, 'Georgian name is required'),
+  name_en: z.string().optional(),
+  name_ru: z.string().optional(),
+  description_ka: z.string().optional(),
+  description_en: z.string().optional(),
+  description_ru: z.string().optional(),
+  price: z.number({ invalid_type_error: "Price must be a number" }).positive('Price must be greater than 0'),
+  parent_category_id: z.string().optional(),
+  category_id: z.string().optional(),
+  stock_quantity: z.number().int().min(0, 'Stock cannot be negative').default(0),
+  gender: z.enum(['Unisex', 'Woman', 'Man']).default('Unisex'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface Props {
   open: boolean;
@@ -17,34 +36,6 @@ interface Props {
   product?: Product;
   categories: Category[];
 }
-
-interface FormState {
-  name_ka: string;
-  name_en: string;
-  name_ru: string;
-  description_ka: string;
-  description_en: string;
-  description_ru: string;
-  price: string;
-  parent_category_id: string;
-  category_id: string;
-  stock_quantity: string;
-  gender: string;
-}
-
-const EMPTY_FORM: FormState = {
-  name_ka: '',
-  name_en: '',
-  name_ru: '',
-  description_ka: '',
-  description_en: '',
-  description_ru: '',
-  price: '',
-  parent_category_id: '',
-  category_id: '',
-  stock_quantity: '0',
-  gender: 'Unisex',
-};
 
 async function uploadProductImage(file: File): Promise<string> {
   const ext = file.name.split('.').pop();
@@ -60,53 +51,64 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
 
-  const [formData, setFormData] = useState<FormState>(EMPTY_FORM);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { register, handleSubmit, reset, watch, setValue, control, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name_ka: '',
+      name_en: '',
+      name_ru: '',
+      description_ka: '',
+      description_en: '',
+      description_ru: '',
+      price: 0,
+      parent_category_id: '',
+      category_id: '',
+      stock_quantity: 0,
+      gender: 'Unisex',
+    }
+  });
+
+  const watchParentCat = watch('parent_category_id');
   const parentCategories = categories.filter((c) => !c.parent_id);
-  const subcategories = categories.filter(
-    (c) => c.parent_id === formData.parent_category_id
-  );
+  const subcategories = categories.filter((c) => c.parent_id === watchParentCat);
 
   useEffect(() => {
     if (open && product) {
       const current = categories.find((c) => c.id === product.category_id);
       const parentId = current?.parent_id ?? (current && !current.parent_id ? current.id : '');
       const childId = current?.parent_id ? current.id : '';
-      setFormData({
+      reset({
         name_ka: product.name_ka || '',
         name_en: product.name_en || '',
         name_ru: product.name_ru || '',
         description_ka: product.description_ka || '',
         description_en: product.description_en || '',
         description_ru: product.description_ru || '',
-        price: product.price?.toString() || '',
+        price: product.price || 0,
         parent_category_id: parentId,
         category_id: childId,
-        stock_quantity: product.stock_quantity?.toString() || '0',
-        gender: product.gender || 'Unisex',
+        stock_quantity: product.stock_quantity || 0,
+        gender: (product.gender as any) || 'Unisex',
       });
       setImagePreview(product.image_url);
       setImageFile(null);
     } else if (!open) {
-      setFormData(EMPTY_FORM);
+      reset();
       setImageFile(null);
       setImagePreview(null);
     }
-  }, [open, product]);
-
-  const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setFormData((prev) => ({ ...prev, [key]: e.target.value }));
+  }, [open, product, categories, reset]);
 
   const copyFromGeorgian = (lang: 'en' | 'ru') => () => {
-    setFormData((prev) => ({
-      ...prev,
-      [`name_${lang}`]: prev.name_ka,
-      [`description_${lang}`]: prev.description_ka,
-    }));
+    const kaName = watch('name_ka');
+    const kaDesc = watch('description_ka');
+    setValue(`name_${lang}`, kaName);
+    setValue(`description_${lang}`, kaDesc);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,18 +124,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.name_ka.trim()) {
-      toast.error('Georgian name is required');
-      return;
-    }
-    const price = parseFloat(formData.price);
-    if (!price || price <= 0) {
-      toast.error('Price must be greater than 0');
-      return;
-    }
+  const onSubmit = async (values: FormValues) => {
     if (!isEdit && !imageFile) {
       toast.error('Please select a product image');
       return;
@@ -141,23 +132,25 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
 
     setUploading(true);
     try {
-      let imageUrl = product?.image_url ?? '';
+      let imageUrl: string | null | undefined = isEdit ? undefined : null;
       if (imageFile) {
         imageUrl = await uploadProductImage(imageFile);
+      } else if (isEdit) {
+        imageUrl = product?.image_url ?? null;
       }
 
       const input: ProductInput = {
-        name_ka: formData.name_ka.trim(),
-        name_en: formData.name_en.trim() || undefined,
-        name_ru: formData.name_ru.trim() || undefined,
-        description_ka: formData.description_ka.trim() || undefined,
-        description_en: formData.description_en.trim() || undefined,
-        description_ru: formData.description_ru.trim() || undefined,
-        price,
+        name_ka: values.name_ka.trim(),
+        name_en: values.name_en?.trim() || undefined,
+        name_ru: values.name_ru?.trim() || undefined,
+        description_ka: values.description_ka?.trim() || undefined,
+        description_en: values.description_en?.trim() || undefined,
+        description_ru: values.description_ru?.trim() || undefined,
+        price: values.price,
         image_url: imageUrl,
-        category_id: formData.category_id || formData.parent_category_id || null,
-        stock_quantity: parseInt(formData.stock_quantity) || 0,
-        gender: formData.gender || 'Unisex',
+        category_id: values.category_id || values.parent_category_id || null,
+        stock_quantity: values.stock_quantity,
+        gender: values.gender,
       };
 
       if (isEdit && product) {
@@ -169,8 +162,8 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
       }
 
       onOpenChange(false);
-    } catch (err: any) {
-      toast.error(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setUploading(false);
     }
@@ -185,11 +178,11 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
       </div>
       <div>
         <Label>Name ({label})</Label>
-        <Input value={formData[`name_${lang}`]} onChange={set(`name_${lang}`)} placeholder={`Name in ${label}`} />
+        <Input {...register(`name_${lang}`)} placeholder={`Name in ${label}`} />
       </div>
       <div>
         <Label>Description ({label})</Label>
-        <Textarea value={formData[`description_${lang}`]} onChange={set(`description_${lang}`)} className="min-h-[80px]" />
+        <Textarea {...register(`description_${lang}`)} className="min-h-[80px]" />
       </div>
     </TabsContent>
   );
@@ -203,7 +196,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Language tabs */}
           <Tabs defaultValue="ka">
             <TabsList className="w-full">
@@ -215,11 +208,12 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
             <TabsContent value="ka" className="space-y-4 mt-4">
               <div>
                 <Label>Name (Georgian) *</Label>
-                <Input value={formData.name_ka} onChange={set('name_ka')} required placeholder="მაგ: Avon — Far Away" />
+                <Input {...register('name_ka')} placeholder="მაგ: Avon — Far Away" />
+                {errors.name_ka && <p className="text-destructive text-xs mt-1">{errors.name_ka.message}</p>}
               </div>
               <div>
                 <Label>Description (Georgian)</Label>
-                <Textarea value={formData.description_ka} onChange={set('description_ka')} className="min-h-[80px]" />
+                <Textarea {...register('description_ka')} className="min-h-[80px]" />
               </div>
             </TabsContent>
 
@@ -231,11 +225,13 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Price (₾) *</Label>
-              <Input type="number" step="0.01" min="0.01" value={formData.price} onChange={set('price')} required />
+              <Input type="number" step="0.01" {...register('price', { valueAsNumber: true })} />
+              {errors.price && <p className="text-destructive text-xs mt-1">{errors.price.message}</p>}
             </div>
             <div>
               <Label>Stock</Label>
-              <Input type="number" min="0" value={formData.stock_quantity} onChange={set('stock_quantity')} />
+              <Input type="number" {...register('stock_quantity', { valueAsNumber: true })} />
+              {errors.stock_quantity && <p className="text-destructive text-xs mt-1">{errors.stock_quantity.message}</p>}
             </div>
           </div>
 
@@ -243,13 +239,12 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
           <div>
             <Label>Gender</Label>
             <select
-              value={formData.gender}
-              onChange={set('gender')}
+              {...register('gender')}
               className="w-full px-3 py-2 border border-border rounded-sm bg-background text-foreground text-sm"
             >
               <option value="Unisex">Unisex</option>
-              <option value="WOMAN">Woman</option>
-              <option value="MAN">Man</option>
+              <option value="Woman">Woman</option>
+              <option value="Man">Man</option>
             </select>
           </div>
 
@@ -258,8 +253,11 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
             <div>
               <Label>Category</Label>
               <select
-                value={formData.parent_category_id}
-                onChange={(e) => setFormData((p) => ({ ...p, parent_category_id: e.target.value, category_id: '' }))}
+                {...register('parent_category_id')}
+                onChange={(e) => {
+                  setValue('parent_category_id', e.target.value);
+                  setValue('category_id', '');
+                }}
                 className="w-full px-3 py-2 border border-border rounded-sm bg-background text-foreground text-sm"
               >
                 <option value="">— None —</option>
@@ -272,8 +270,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
               <div>
                 <Label>Subcategory</Label>
                 <select
-                  value={formData.category_id}
-                  onChange={set('category_id')}
+                  {...register('category_id')}
                   className="w-full px-3 py-2 border border-border rounded-sm bg-background text-foreground text-sm"
                 >
                   <option value="">— None —</option>
