@@ -79,7 +79,7 @@ const ChatWidget = () => {
     return (
         <>
             <div id="bp-webchat" />
-            {isLoaded && <AIConsultant onClick={toggleChat} isOpen={isOpen} isTalking={isTyping} />}
+            <AIConsultant onClick={toggleChat} isOpen={isOpen} isTalking={isTyping} />
         </>
     );
 };
