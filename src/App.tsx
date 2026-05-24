@@ -24,6 +24,7 @@ import ChatWidget from "./components/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop";
 
 const Account = lazy(() => import("./pages/Account"));
+const CustomerOrders = lazy(() => import("./pages/CustomerOrders"));
 
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
@@ -87,6 +88,9 @@ const App = () => (
                 <Route element={<ProtectedCustomerRoute />}>
                   <Route path="/account" element={
                     <Suspense fallback={<AdminFallback />}><Account /></Suspense>
+                  } />
+                  <Route path="/account/orders" element={
+                    <Suspense fallback={<AdminFallback />}><CustomerOrders /></Suspense>
                   } />
                 </Route>
 

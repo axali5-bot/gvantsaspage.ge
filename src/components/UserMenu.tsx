@@ -57,7 +57,7 @@ const UserMenu = () => {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link to="/account" className="flex items-center gap-2 cursor-pointer text-sm font-body text-muted-foreground">
+          <Link to="/account/orders" className="flex items-center gap-2 cursor-pointer text-sm font-body">
             <ShoppingBag size={14} className="text-rose-300" />
             {t('header.my_orders')}
           </Link>

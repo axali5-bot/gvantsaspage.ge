@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import { User, Phone, MapPin, ShoppingBag, LogOut } from 'lucide-react';
+import { User, Phone, MapPin, ShoppingBag, LogOut, ChevronRight } from 'lucide-react';
 import SEO from '@/components/SEO';
 
 const Account = () => {
@@ -179,13 +179,16 @@ const Account = () => {
           </div>
 
           {/* Orders */}
-          <div className="bg-white rounded-[1.5rem] border border-rose-100 shadow-sm p-8">
-            <div className="flex items-center gap-3 text-rose-400 mb-3">
-              <ShoppingBag size={18} />
-              <h2 className="font-display text-lg text-rose-500/80">{t('account.my_orders')}</h2>
+          <Link to="/account/orders" className="block bg-white rounded-[1.5rem] border border-rose-100 shadow-sm p-8 hover:shadow-md hover:border-rose-200 transition-all group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 text-rose-400">
+                <ShoppingBag size={18} />
+                <h2 className="font-display text-lg text-rose-500/80 group-hover:text-rose-600">{t('account.my_orders')}</h2>
+              </div>
+              <ChevronRight size={18} className="text-rose-300 group-hover:text-rose-500 group-hover:translate-x-1 transition-all" />
             </div>
-            <p className="font-body text-sm text-muted-foreground">{t('account.orders_coming_soon')} ✨</p>
-          </div>
+            <p className="font-body text-sm text-muted-foreground mt-2">{t('account_orders.view_all')}</p>
+          </Link>
 
           {/* Sign Out */}
           <button

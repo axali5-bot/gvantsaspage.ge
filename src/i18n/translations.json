@@ -89,6 +89,27 @@
         "my_orders": "My Orders",
         "admin_panel": "Admin Panel",
         "logout": "Sign Out"
+      },
+      "account_orders": {
+        "title": "My Orders",
+        "view_all": "View all and check statuses",
+        "back_to_account": "Back to account",
+        "order_number": "Order #",
+        "items_count_one": "1 item",
+        "items_count_other": "{{count}} items",
+        "delivery_to": "Delivery to",
+        "loading_orders": "Loading orders..."
+      },
+      "empty_orders": {
+        "title": "No orders yet",
+        "subtitle": "Explore our catalog and find your signature scent ✨",
+        "cta": "Shop now"
+      },
+      "order_status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Delivered",
+        "cancelled": "Cancelled"
       }
     }
   },
@@ -182,6 +203,27 @@
         "my_orders": "ჩემი შეკვეთები",
         "admin_panel": "ადმინ პანელი",
         "logout": "გასვლა"
+      },
+      "account_orders": {
+        "title": "ჩემი შეკვეთები",
+        "view_all": "ნახე ყველა და შეამოწმე სტატუსები",
+        "back_to_account": "ანგარიშზე დაბრუნება",
+        "order_number": "შეკვეთა #",
+        "items_count_one": "1 ნივთი",
+        "items_count_other": "{{count}} ნივთი",
+        "delivery_to": "მიწოდება",
+        "loading_orders": "შეკვეთები იტვირთება..."
+      },
+      "empty_orders": {
+        "title": "თქვენ ჯერ არ გაქვთ შეკვეთები",
+        "subtitle": "გადადით კატალოგში და აღმოაჩინეთ თქვენი არომატი ✨",
+        "cta": "შეიძინე ახლა"
+      },
+      "order_status": {
+        "pending": "მუშავდება",
+        "processing": "მზადდება",
+        "completed": "მიწოდებულია",
+        "cancelled": "გაუქმდა"
       }
     }
   },
@@ -275,6 +317,27 @@
         "my_orders": "Мои заказы",
         "admin_panel": "Панель администратора",
         "logout": "Выйти"
+      },
+      "account_orders": {
+        "title": "Мои заказы",
+        "view_all": "Просмотрите все и проверьте статусы",
+        "back_to_account": "Назад к аккаунту",
+        "order_number": "Заказ #",
+        "items_count_one": "1 товар",
+        "items_count_other": "{{count}} товаров",
+        "delivery_to": "Доставка по адресу",
+        "loading_orders": "Загрузка заказов..."
+      },
+      "empty_orders": {
+        "title": "Пока нет заказов",
+        "subtitle": "Перейдите в каталог и найдите свой аромат ✨",
+        "cta": "Купить сейчас"
+      },
+      "order_status": {
+        "pending": "В обработке",
+        "processing": "Готовится",
+        "completed": "Доставлен",
+        "cancelled": "Отменён"
       }
     }
   }
