@@ -61,13 +61,13 @@ const CustomerOrders = () => {
           {isError && (
             <div className="text-center py-12">
               <p className="font-body text-sm text-muted-foreground mb-4">
-                შეცდომა შეკვეთების ჩატვირთვისას
+                {t('account_orders.load_error')}
               </p>
               <button
                 onClick={() => refetch()}
                 className="text-[11px] uppercase tracking-widest text-rose-400 hover:text-rose-500 font-semibold border border-rose-200 px-4 py-2 rounded-full transition-colors"
               >
-                სცადე თავიდან
+                {t('account_orders.retry')}
               </button>
             </div>
           )}

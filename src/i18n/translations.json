@@ -98,7 +98,9 @@
         "items_count_one": "1 item",
         "items_count_other": "{{count}} items",
         "delivery_to": "Delivery to",
-        "loading_orders": "Loading orders..."
+        "loading_orders": "Loading orders...",
+        "load_error": "Failed to load orders",
+        "retry": "Try again"
       },
       "empty_orders": {
         "title": "No orders yet",
@@ -212,7 +214,9 @@
         "items_count_one": "1 ნივთი",
         "items_count_other": "{{count}} ნივთი",
         "delivery_to": "მიწოდება",
-        "loading_orders": "შეკვეთები იტვირთება..."
+        "loading_orders": "შეკვეთები იტვირთება...",
+        "load_error": "შეცდომა შეკვეთების ჩატვირთვისას",
+        "retry": "სცადე თავიდან"
       },
       "empty_orders": {
         "title": "თქვენ ჯერ არ გაქვთ შეკვეთები",
@@ -326,7 +330,9 @@
         "items_count_one": "1 товар",
         "items_count_other": "{{count}} товаров",
         "delivery_to": "Доставка по адресу",
-        "loading_orders": "Загрузка заказов..."
+        "loading_orders": "Загрузка заказов...",
+        "load_error": "Не удалось загрузить заказы",
+        "retry": "Попробовать снова"
       },
       "empty_orders": {
         "title": "Пока нет заказов",

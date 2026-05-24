@@ -51,22 +51,22 @@ export const CustomerOrderCard = ({ order }: CustomerOrderCardProps) => {
     <div className="bg-white rounded-2xl border border-rose-100 overflow-hidden hover:shadow-md transition-all">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-5 text-left"
+        className="w-full flex items-center justify-between gap-3 p-5 text-left"
       >
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-sm tracking-widest text-foreground">
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <span className="font-display text-sm tracking-widest text-foreground truncate">
             {t('account_orders.order_number')}{shortId}
           </span>
-          <span className="font-body text-xs text-muted-foreground">
+          <span className="font-body text-xs text-muted-foreground truncate">
             {formattedDate} · {t('account_orders.items_count', { count: itemCount })}
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex flex-col items-end gap-1">
-            <span className={`text-[10px] font-body tracking-wider uppercase px-2.5 py-1 rounded-full border ${statusStyle}`}>
+            <span className={`text-[10px] font-body tracking-wider uppercase px-2.5 py-1 rounded-full border whitespace-nowrap ${statusStyle}`}>
               {t(`order_status.${status}`)}
             </span>
-            <span className="font-display text-base text-rose-600">
+            <span className="font-display text-base text-rose-600 whitespace-nowrap">
               {order.total_price.toFixed(2)} ₾
             </span>
           </div>
