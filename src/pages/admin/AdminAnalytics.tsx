@@ -95,7 +95,13 @@ const AdminAnalytics = () => {
             />
             <KPICard
               label="Top Product"
-              value={kpis.topProductName ? kpis.topProductName.slice(0, 28) : '—'}
+              value={
+                kpis.topProductName
+                  ? kpis.topProductName.length > 28
+                    ? kpis.topProductName.slice(0, 28) + '…'
+                    : kpis.topProductName
+                  : '—'
+              }
               icon={Star}
               hint={hint}
             />

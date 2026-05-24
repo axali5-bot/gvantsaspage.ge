@@ -158,7 +158,7 @@ export const useAnalytics = (range: TimeRange): AnalyticsResult => {
       statusBreakdown,
       filteredCount: filtered.length,
     };
-  }, [orders, range, isLoading, isError]);
+  }, [orders, range]);
 
   return { ...result, isLoading, isError, refetch };
 };
