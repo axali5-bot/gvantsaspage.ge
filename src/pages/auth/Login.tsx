@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
+import { GoogleOAuthButton } from '@/components/auth/GoogleOAuthButton';
 
 const schema = z.object({
   email: z.string().email('არასწორი ელ-ფოსტა'),
@@ -83,9 +84,17 @@ const Login = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-[11px] uppercase tracking-widest text-rose-400 font-semibold">
-                {t('auth.password')}
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-[11px] uppercase tracking-widest text-rose-400 font-semibold">
+                  {t('auth.password')}
+                </Label>
+                <Link
+                  to="/auth/forgot-password"
+                  className="text-xs text-rose-400 hover:text-rose-500 font-body"
+                >
+                  {t('auth.forgot_password')}
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -105,12 +114,20 @@ const Login = () => {
             </Button>
           </form>
 
-          <p className="text-center text-xs font-body text-muted-foreground mt-4">
-            {/* Phase 4D */}
-            <span className="text-rose-300">პაროლის აღდგენა მალე იქნება ხელმისაწვდომი</span>
-          </p>
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-rose-100" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-3 text-muted-foreground uppercase tracking-widest">
+                {t('auth.or')}
+              </span>
+            </div>
+          </div>
 
-          <p className="text-center text-sm font-body text-muted-foreground mt-4">
+          <GoogleOAuthButton mode="login" />
+
+          <p className="text-center text-sm font-body text-muted-foreground mt-6">
             {t('auth.no_account')}{' '}
             <Link to="/auth/signup" className="text-rose-500 hover:text-rose-600 font-medium">
               {t('header.signup')}

@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
+import { GoogleOAuthButton } from '@/components/auth/GoogleOAuthButton';
 
 const schema = z.object({
   full_name: z.string().min(2, 'სახელი მინიმუმ 2 სიმბოლო'),
@@ -130,6 +131,19 @@ const Signup = () => {
               {isLoading ? '...' : t('auth.signup_button')}
             </Button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-rose-100" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-3 text-muted-foreground uppercase tracking-widest">
+                {t('auth.or')}
+              </span>
+            </div>
+          </div>
+
+          <GoogleOAuthButton mode="signup" />
 
           <p className="text-center text-sm font-body text-muted-foreground mt-6">
             {t('auth.have_account')}{' '}

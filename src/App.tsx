@@ -15,6 +15,8 @@ import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import { CartProvider } from "./hooks/useCart";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
@@ -87,6 +89,8 @@ const App = () => (
                 {/* Auth routes */}
                 <Route path="/auth/signup" element={<Signup />} />
                 <Route path="/auth/login" element={<Login />} />
+                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
 
                 {/* Protected customer routes */}
                 <Route element={<ProtectedCustomerRoute />}>
