@@ -27,6 +27,7 @@ const Account = lazy(() => import("./pages/Account"));
 const CustomerOrders = lazy(() => import("./pages/CustomerOrders"));
 
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
@@ -65,7 +66,10 @@ const App = () => (
                     </ProtectedAdminRoute>
                   }
                 >
-                  <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+                  <Route path="/admin" element={<Navigate to="/admin/analytics" replace />} />
+                  <Route path="/admin/analytics" element={
+                    <Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>
+                  } />
                   <Route path="/admin/products" element={
                     <Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>
                   } />

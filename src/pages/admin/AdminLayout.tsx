@@ -1,10 +1,11 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Package, ShoppingBag, Tags, BookOpen } from 'lucide-react';
+import { ArrowLeft, Package, ShoppingBag, Tags, BookOpen, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
 const navItems = [
+  { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/products', label: 'Products', icon: Package },
   { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { to: '/admin/categories', label: 'Categories', icon: Tags },
