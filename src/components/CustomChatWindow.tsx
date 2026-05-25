@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface CustomChatWindowProps {
     isOpen: boolean;
     onClose: () => void;
+    onLoadingChange?: (loading: boolean) => void;
 }
 
 type Message = {
@@ -14,7 +15,7 @@ type Message = {
     sender: "user" | "bot";
 };
 
-const CustomChatWindow = ({ isOpen, onClose }: CustomChatWindowProps) => {
+const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindowProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +46,7 @@ const CustomChatWindow = ({ isOpen, onClose }: CustomChatWindowProps) => {
         setMessages((prev) => [...prev, { id: Date.now().toString(), text: userMsg, sender: "user" }]);
         
         setIsLoading(true);
+        onLoadingChange?.(true);
         try {
             const aiResponse = await sendMessageToGemini(userMsg);
             setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), text: aiResponse, sender: "bot" }]);
@@ -52,6 +54,7 @@ const CustomChatWindow = ({ isOpen, onClose }: CustomChatWindowProps) => {
             setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), text: "უკაცრავად, კავშირის შეცდომაა. გთხოვთ სცადოთ მოგვიანებით. 🌹", sender: "bot" }]);
         } finally {
             setIsLoading(false);
+            onLoadingChange?.(false);
         }
     };
 

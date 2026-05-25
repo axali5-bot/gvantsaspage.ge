@@ -4,14 +4,20 @@ import CustomChatWindow from "./CustomChatWindow";
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
-
-    const toggle = () => setIsOpen((prev) => !prev);
-    const close = () => setIsOpen(false);
+    const [isAiLoading, setIsAiLoading] = useState(false);
 
     return (
         <>
-            <CustomChatWindow isOpen={isOpen} onClose={close} />
-            <AIConsultant onClick={toggle} isOpen={isOpen} isTalking={false} />
+            <CustomChatWindow
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                onLoadingChange={setIsAiLoading}
+            />
+            <AIConsultant
+                onClick={() => setIsOpen((prev) => !prev)}
+                isOpen={isOpen}
+                isTalking={isAiLoading}
+            />
         </>
     );
 };
