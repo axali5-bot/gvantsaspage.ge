@@ -53,20 +53,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      await fetchProfile(session?.user?.id);
-      setLoading(false);
-    });
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (error) throw error;
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user?.id) await fetchProfile(session.user.id);
+      } catch {
+        // Bad/expired session — clear and continue as anonymous
+        await supabase.auth.signOut().catch(() => {});
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    // Hard timeout: if session init takes >8s, unblock the app
+    const timeout = setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 8000);
+
+    init().then(() => clearTimeout(timeout));
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
-      await fetchProfile(newSession?.user?.id);
+      await fetchProfile(newSession?.user?.id).catch(() => {});
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
