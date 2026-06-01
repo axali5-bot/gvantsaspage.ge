@@ -8,23 +8,13 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error('Missing Supabase environment variables');
 }
 
-// Abort any Supabase request (including token refresh) that hangs > 10s.
-// Without this, an expired OAuth session causes the JS client to queue ALL
-// database requests behind a token refresh that never completes.
+// Abort any Supabase request that hangs > 10s (prevents token-refresh
+// deadlock: Supabase JS v2 queues all DB requests behind a refresh call
+// that can hang indefinitely when an OAuth session expires).
 const fetchWithTimeout = (url: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
-    // Merge any existing signal with our timeout signal
-    const signal = init.signal
-        ? (() => {
-              const merged = new AbortController();
-              const abort = () => merged.abort();
-              init.signal.addEventListener('abort', abort);
-              controller.signal.addEventListener('abort', abort);
-              return merged.signal;
-          })()
-        : controller.signal;
-    return fetch(url, { ...init, signal }).finally(() => clearTimeout(timeoutId));
+    const id = setTimeout(() => controller.abort(), 10_000);
+    return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
 };
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
