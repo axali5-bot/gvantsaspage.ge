@@ -8,15 +8,20 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error('Missing Supabase environment variables');
 }
 
-// Abort any Supabase request that hangs > 10s (prevents token-refresh
-// deadlock: Supabase JS v2 queues all DB requests behind a refresh call
-// that can hang indefinitely when an OAuth session expires).
-const fetchWithTimeout = (url: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 10_000);
-    return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
-};
+// If the stored access token expired > 1 hour ago, clear it before the client
+// initialises. Supabase JS v2 queues ALL DB requests behind a token refresh;
+// a long-stale Google OAuth session causes every query to stall forever.
+const SESSION_KEY = `sb-rhfzdzipciasljblbmtf-auth-token`;
+try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+        const parsed = JSON.parse(raw) as { expires_at?: number } | null;
+        const expiresAt = parsed?.expires_at ?? 0;
+        const staleSeconds = Math.floor(Date.now() / 1000) - expiresAt;
+        if (staleSeconds > 3600) {
+            localStorage.removeItem(SESSION_KEY);
+        }
+    }
+} catch { /* localStorage unavailable or JSON malformed — safe to ignore */ }
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: { fetch: fetchWithTimeout },
-});
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
