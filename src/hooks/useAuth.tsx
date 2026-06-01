@@ -78,10 +78,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     init().then(() => clearTimeout(timeout));
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
-      await fetchProfile(newSession?.user?.id).catch(() => {});
+      // Defer Supabase calls outside the auth callback. The callback runs while
+      // GoTrue holds its navigator lock; awaiting another query here deadlocks
+      // and stalls EVERY other request (e.g. the products fetch) indefinitely.
+      setTimeout(() => {
+        fetchProfile(newSession?.user?.id).catch(() => {});
+      }, 0);
     });
 
     return () => {
