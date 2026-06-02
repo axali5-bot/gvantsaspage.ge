@@ -34,6 +34,7 @@ const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminCatalogs = lazy(() => import("./pages/admin/AdminCatalogs"));
+const AdminIncomingOrders = lazy(() => import("./pages/admin/AdminIncomingOrders"));
 
 const queryClient = new QueryClient();
 
@@ -51,9 +52,9 @@ const App = () => (
           <CartProvider>
             <Toaster />
             <Sonner />
-            <ChatWidget />
             <BrowserRouter>
               <ScrollToTop />
+              <ChatWidget />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -83,6 +84,9 @@ const App = () => (
                   } />
                   <Route path="/admin/catalogs" element={
                     <Suspense fallback={<AdminFallback />}><AdminCatalogs /></Suspense>
+                  } />
+                  <Route path="/admin/incoming-orders" element={
+                    <Suspense fallback={<AdminFallback />}><AdminIncomingOrders /></Suspense>
                   } />
                 </Route>
 
