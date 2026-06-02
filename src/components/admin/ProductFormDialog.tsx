@@ -9,6 +9,8 @@ import { Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { useCreateProduct, useUpdateProduct, Product, ProductInput } from '@/hooks/useProducts';
+import { syncProduct } from '@/lib/samkaulebiSync';
+import { useInvalidateSyncMap } from '@/hooks/useSamkaulebiSync';
 import { Category } from '@/hooks/useCategories';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,6 +52,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
   const isEdit = !!product;
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
+  const invalidateSyncMap = useInvalidateSyncMap();
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -154,11 +157,18 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
       };
 
       if (isEdit && product) {
-        await updateProduct.mutateAsync({ id: product.id, patch: input });
+        const updated = await updateProduct.mutateAsync({ id: product.id, patch: input });
         toast.success('Product updated successfully');
+        // fire-and-forget sync — non-blocking, result shown via badge refresh
+        syncProduct({ ...updated, image_url: updated.image_url ?? null }).then((r) => {
+          if (r.ok) invalidateSyncMap();
+        });
       } else {
-        await createProduct.mutateAsync(input);
+        const created = await createProduct.mutateAsync(input);
         toast.success('Product added successfully');
+        syncProduct({ ...created, image_url: created.image_url ?? null }).then((r) => {
+          if (r.ok) invalidateSyncMap();
+        });
       }
 
       onOpenChange(false);

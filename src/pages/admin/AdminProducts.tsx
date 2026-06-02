@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
+import { useSamkaulebiSync, SYNC_KEY } from '@/hooks/useSamkaulebiSync';
+import { syncProduct } from '@/lib/samkaulebiSync';
 import { ProductTable } from '@/components/admin/ProductTable';
 import { ProductFormDialog } from '@/components/admin/ProductFormDialog';
 import { ProductDeleteDialog } from '@/components/admin/ProductDeleteDialog';
@@ -8,11 +11,21 @@ import { ProductBulkDeleteDialog } from '@/components/admin/ProductBulkDeleteDia
 import { ProductImportDialog } from '@/components/admin/ProductImportDialog';
 import { ProductExportButtons } from '@/components/admin/ProductExportButtons';
 import { Button } from '@/components/ui/button';
-import { Plus, FileUp } from 'lucide-react';
+import { Plus, FileUp, Send } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface BulkSyncState {
+  running: boolean;
+  done: number;
+  total: number;
+  errors: number;
+}
 
 export const AdminProducts = () => {
+  const qc = useQueryClient();
   const { data: products = [], isLoading } = useProducts();
   const { data: categories = [] } = useCategories();
+  const { data: syncMap = new Map() } = useSamkaulebiSync();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
@@ -20,6 +33,26 @@ export const AdminProducts = () => {
   const [importOpen, setImportOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkSync, setBulkSync] = useState<BulkSyncState | null>(null);
+
+  const handleBulkSync = async () => {
+    if (products.length === 0) return;
+    setBulkSync({ running: true, done: 0, total: products.length, errors: 0 });
+    let errors = 0;
+    for (let i = 0; i < products.length; i++) {
+      const result = await syncProduct(products[i]);
+      if (!result.ok) errors++;
+      setBulkSync({ running: true, done: i + 1, total: products.length, errors });
+    }
+    setBulkSync({ running: false, done: products.length, total: products.length, errors });
+    await qc.invalidateQueries({ queryKey: SYNC_KEY });
+    if (errors === 0) {
+      toast.success(`✓ ${products.length} პროდუქტი გაიგზავნა samkaulebi-ზე`);
+    } else {
+      toast.warning(`${products.length - errors} გაიგზავნა, ${errors} შეცდომა`);
+    }
+    setTimeout(() => setBulkSync(null), 4000);
+  };
 
   if (isLoading) return <p className="text-muted-foreground py-8">Loading products...</p>;
 
@@ -27,7 +60,7 @@ export const AdminProducts = () => {
     <div className="space-y-4">
       <div className="flex justify-between items-center gap-2 flex-wrap">
         <h2 className="font-display text-xl">Products ({products.length})</h2>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
           <ProductExportButtons products={products} />
           <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
             <FileUp size={14} className="mr-1" /> Import CSV
@@ -37,6 +70,37 @@ export const AdminProducts = () => {
               Delete {selected.size} selected
             </Button>
           )}
+
+          {/* Bulk sync button */}
+          {bulkSync ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground border border-border rounded px-3 py-1.5 min-w-[180px]">
+              {bulkSync.running ? (
+                <>
+                  <span className="animate-spin text-base">⏳</span>
+                  <span>{bulkSync.done}/{bulkSync.total} გაიგზავნა…</span>
+                </>
+              ) : (
+                <>
+                  <span>{bulkSync.errors === 0 ? '✓' : '⚠'}</span>
+                  <span>
+                    {bulkSync.done - bulkSync.errors}/{bulkSync.total}
+                    {bulkSync.errors > 0 && `, ${bulkSync.errors} შეცდომა`}
+                  </span>
+                </>
+              )}
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBulkSync}
+              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
+            >
+              <Send size={14} className="mr-1" />
+              samkaulebi-ზე გაგზავნა
+            </Button>
+          )}
+
           <Button size="sm" onClick={() => setCreateOpen(true)}>
             <Plus size={14} className="mr-1" /> Add Product
           </Button>
@@ -49,6 +113,7 @@ export const AdminProducts = () => {
         onDelete={setDeleteProduct}
         selected={selected}
         onSelectionChange={setSelected}
+        syncMap={syncMap}
       />
 
       <ProductFormDialog

@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Product } from '@/hooks/useProducts';
+import { SyncMap } from '@/hooks/useSamkaulebiSync';
 
 const PAGE_SIZE = 20;
 
@@ -17,9 +18,20 @@ interface Props {
   onDelete: (product: Product) => void;
   selected: Set<string>;
   onSelectionChange: (selected: Set<string>) => void;
+  syncMap?: SyncMap;
 }
 
-export const ProductTable = ({ products, onEdit, onDelete, selected, onSelectionChange }: Props) => {
+function SyncBadge({ status, error }: { status?: string; error?: string | null }) {
+  if (!status) return <span className="text-xs text-muted-foreground">—</span>;
+  if (status === 'synced') return <span className="text-xs text-emerald-600 font-medium">✓ synced</span>;
+  if (status === 'error') return (
+    <span className="text-xs text-destructive font-medium" title={error ?? undefined}>⚠ error</span>
+  );
+  if (status === 'dirty') return <span className="text-xs text-amber-600 font-medium">↻ dirty</span>;
+  return null;
+}
+
+export const ProductTable = ({ products, onEdit, onDelete, selected, onSelectionChange, syncMap }: Props) => {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('name_ka');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -106,6 +118,7 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                 </button>
               </TableHead>
               <TableHead>Gender</TableHead>
+              {syncMap && <TableHead>Sync</TableHead>}
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -133,6 +146,14 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                   <TableCell className="font-body">{product.price} ₾</TableCell>
                   <TableCell className="font-body">{product.stock_quantity ?? 0}</TableCell>
                   <TableCell className="font-body text-xs text-muted-foreground">{product.gender || '—'}</TableCell>
+                  {syncMap && (
+                    <TableCell>
+                      <SyncBadge
+                        status={syncMap.get(product.id)?.status}
+                        error={syncMap.get(product.id)?.last_error}
+                      />
+                    </TableCell>
+                  )}
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>

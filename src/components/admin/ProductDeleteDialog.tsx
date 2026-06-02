@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useDeleteProduct, Product } from '@/hooks/useProducts';
+import { remoteSyncDelete } from '@/lib/samkaulebiSync';
 
 interface Props {
   product: Product | null;
@@ -25,6 +26,8 @@ export const ProductDeleteDialog = ({ product, onClose }: Props) => {
     if (!product) return;
     setDeleting(true);
     try {
+      // remove from samkaulebi first — if this fails we skip (local delete still proceeds)
+      await remoteSyncDelete(product.id);
       await deleteProduct.mutateAsync(product.id);
       toast.success('Product deleted');
       onClose();
