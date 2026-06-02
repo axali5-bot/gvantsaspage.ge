@@ -109,6 +109,42 @@ export type Database = {
           },
         ]
       }
+      incoming_orders: {
+        Row: {
+          created_at: string
+          customer_address: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          items: Json
+          samkaulebi_order_id: string | null
+          status: string
+          total_price: number
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          items?: Json
+          samkaulebi_order_id?: string | null
+          status?: string
+          total_price?: number
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          items?: Json
+          samkaulebi_order_id?: string | null
+          status?: string
+          total_price?: number
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -202,6 +238,7 @@ export type Database = {
           name_ru: string | null
           price: number
           stock_quantity: number | null
+          updated_at: string
         }
         Insert: {
           category_id?: string | null
@@ -217,6 +254,7 @@ export type Database = {
           name_ru?: string | null
           price: number
           stock_quantity?: number | null
+          updated_at?: string
         }
         Update: {
           category_id?: string | null
@@ -232,6 +270,7 @@ export type Database = {
           name_ru?: string | null
           price?: number
           stock_quantity?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -268,21 +307,66 @@ export type Database = {
         }
         Relationships: []
       }
+      samkaulebi_sync: {
+        Row: {
+          avon_product_id: string
+          created_at: string
+          last_error: string | null
+          last_synced_at: string
+          samkaulebi_id: string
+          status: string
+        }
+        Insert: {
+          avon_product_id: string
+          created_at?: string
+          last_error?: string | null
+          last_synced_at?: string
+          samkaulebi_id: string
+          status?: string
+        }
+        Update: {
+          avon_product_id?: string
+          created_at?: string
+          last_error?: string | null
+          last_synced_at?: string
+          samkaulebi_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "samkaulebi_sync_avon_product_id_fkey"
+            columns: ["avon_product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      create_order: {
-        Args: {
-          p_customer_address: string
-          p_customer_name: string
-          p_customer_phone: string
-          p_items: Json
-          p_user_id?: string | null
-        }
-        Returns: string
-      }
+      create_order:
+        | {
+            Args: {
+              p_customer_address: string
+              p_customer_name: string
+              p_customer_phone: string
+              p_items: Json
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_customer_address: string
+              p_customer_name: string
+              p_customer_phone: string
+              p_items: Json
+              p_user_id?: string
+            }
+            Returns: string
+          }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
