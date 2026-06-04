@@ -28,7 +28,7 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
         if (isOpen && messages.length === 0) {
             startGeminiChat();
             // Optional: send an initial greeting
-            setMessages([{ id: "welcome", text: "გამარჯობა! მე ვარ Gvansa's ასისტენტი ✨ რით შემიძლია დაგეხმაროთ?", sender: "bot" }]);
+            setMessages([{ id: "welcome", text: "გამარჯობა! მე ვარ Gvantsa's ასისტენტი ✨ რით შემიძლია დაგეხმაროთ?", sender: "bot" }]);
         }
     }, [isOpen, messages.length]);
 
@@ -77,7 +77,7 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
                                 <Bot size={20} />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-800 text-[15px] font-display tracking-wide">Gvansa's ასისტენტი</h3>
+                                <h3 className="font-semibold text-gray-800 text-[15px] font-display tracking-wide">Gvantsa's ასისტენტი</h3>
                                 <p className="text-[11px] text-green-500 font-medium flex items-center gap-1.5 mt-0.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 block animate-pulse"></span>
                                     აქტიური
