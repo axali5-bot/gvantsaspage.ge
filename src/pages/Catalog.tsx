@@ -13,6 +13,7 @@ interface CatalogData {
     type: 'link' | 'pdf' | 'flipbook';
     url: string | null;
     pdf_path: string | null;
+    is_active: boolean;
 }
 
 interface FlipbookPage {
@@ -26,7 +27,7 @@ const Catalog = () => {
     const [catalogs, setCatalogs] = useState<CatalogData[]>([]);
     const [catalogPages, setCatalogPages] = useState<Record<string, FlipbookPage[]>>({});
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery] = useState('');
     const [activeFlipbook, setActiveFlipbook] = useState<string | null>(null);
 
     useEffect(() => {
@@ -40,10 +41,13 @@ const Catalog = () => {
                 if (error) throw error;
 
                 if (data) {
-                    const mappedData = data.map(item => ({
-                        ...item,
-                        type: (['link', 'pdf', 'flipbook'].includes(item.type) ? item.type : 'link') as 'link' | 'pdf' | 'flipbook'
-                    }));
+                    const mappedData = data
+                        .filter(item => (item as any).is_active !== false)
+                        .map(item => ({
+                            ...item,
+                            type: (['link', 'pdf', 'flipbook'].includes(item.type) ? item.type : 'link') as 'link' | 'pdf' | 'flipbook',
+                            is_active: (item as any).is_active ?? true,
+                        }));
                     setCatalogs(mappedData);
 
                     // 2. Fetch pages for flipbooks
@@ -90,6 +94,13 @@ const Catalog = () => {
         const isFlipbook = catalog.type === 'flipbook';
         const isPdf = catalog.type === 'pdf';
         const link = isPdf ? catalog.pdf_path : catalog.url;
+
+        // Don't render an empty card — nothing to show the customer
+        const hasContent =
+            (isFlipbook && pages.length > 0) ||
+            (isPdf && !!catalog.pdf_path) ||
+            (!isFlipbook && !isPdf && !!catalog.url);
+        if (!hasContent) return null;
 
         // Check if we are viewing this flipbook
         const isViewingFlipbook = activeFlipbook === brandName;
@@ -252,7 +263,7 @@ const Catalog = () => {
                 title={t('catalog.title')}
                 description="Browse our latest digital catalogs from Avon and Oriflame. Discover new arrivals, exclusive offers, and the full range of our luxury fragrance collection."
             />
-            <Header onSearch={setSearchQuery} />
+            <Header onSearch={() => {}} />
 
             <main className="container max-w-7xl mx-auto px-4 py-16 md:py-24">
                 {/* Page Header */}
