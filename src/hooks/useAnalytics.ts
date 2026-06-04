@@ -32,18 +32,25 @@ export interface StatusBucket {
 
 export interface AnalyticsResult {
   kpis: AnalyticsKPIs;
+  revenueChange: number | null; // % vs previous period; null for 'all'
   ordersPerDay: OrdersPerDayPoint[];
   topProducts: ProductRevenueRow[];
   statusBreakdown: StatusBucket[];
   filteredCount: number;
+  pendingCount: number;
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
 }
 
-const getRangeCutoff = (range: TimeRange): Date | null => {
+const getRangeDays = (range: TimeRange): number | null => {
   if (range === 'all') return null;
-  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+  return range === '7d' ? 7 : range === '30d' ? 30 : 90;
+};
+
+const getRangeCutoff = (range: TimeRange): Date | null => {
+  const days = getRangeDays(range);
+  if (!days) return null;
   return startOfDay(subDays(new Date(), days - 1));
 };
 
@@ -151,12 +158,38 @@ export const useAnalytics = (range: TimeRange): AnalyticsResult => {
       percent: total > 0 ? (statusCounts[s] / total) * 100 : 0,
     }));
 
+    // Previous period revenue for % comparison
+    const days = getRangeDays(range);
+    let revenueChange: number | null = null;
+    if (days) {
+      const prevEnd = startOfDay(subDays(new Date(), days));
+      const prevStart = startOfDay(subDays(new Date(), days * 2 - 1));
+      const prevRevenue = orders
+        .filter((o) => {
+          if (!o.created_at || o.status === 'cancelled') return false;
+          const d = new Date(o.created_at);
+          return d >= prevStart && d < prevEnd;
+        })
+        .reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+      if (prevRevenue > 0) {
+        revenueChange = ((totalRevenue - prevRevenue) / prevRevenue) * 100;
+      } else if (totalRevenue > 0) {
+        revenueChange = 100;
+      } else {
+        revenueChange = 0;
+      }
+    }
+
+    const pendingCount = orders.filter((o) => o.status === 'pending').length;
+
     return {
       kpis: { totalRevenue, orderCount, avgOrderValue, topProductName },
+      revenueChange,
       ordersPerDay,
       topProducts,
       statusBreakdown,
       filteredCount: filtered.length,
+      pendingCount,
     };
   }, [orders, range]);
 

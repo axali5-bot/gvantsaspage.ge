@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Banknote, ShoppingBag, TrendingUp, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight } from 'lucide-react';
 import { useAnalytics, TimeRange } from '@/hooks/useAnalytics';
 import { KPICard } from '@/components/analytics/KPICard';
 import { TimeRangePills } from '@/components/analytics/TimeRangePills';
 import { OrdersBarChart } from '@/components/analytics/OrdersBarChart';
 import { StatusBreakdown } from '@/components/analytics/StatusBreakdown';
 import { TopProductsList } from '@/components/analytics/TopProductsList';
+import { StockAlerts } from '@/components/analytics/StockAlerts';
 
 const RANGE_LABELS: Record<TimeRange, string> = {
   '7d': 'Last 7 days',
@@ -14,14 +16,24 @@ const RANGE_LABELS: Record<TimeRange, string> = {
   all: 'All time',
 };
 
+const RANGE_VS: Record<TimeRange, string> = {
+  '7d': 'vs. prev. 7d',
+  '30d': 'vs. prev. 30d',
+  '90d': 'vs. prev. 90d',
+  all: '',
+};
+
 const AdminAnalytics = () => {
   const [range, setRange] = useState<TimeRange>('30d');
+  const navigate = useNavigate();
   const {
     kpis,
+    revenueChange,
     ordersPerDay,
     topProducts,
     statusBreakdown,
     filteredCount,
+    pendingCount,
     isLoading,
     isError,
     refetch,
@@ -54,8 +66,30 @@ const AdminAnalytics = () => {
   const noOrders = filteredCount === 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-4">
+      {/* ── Operational Alerts (always visible, above time-range filter) ── */}
+      <div className="space-y-2">
+        {/* Pending orders banner */}
+        {pendingCount > 0 && (
+          <button
+            onClick={() => navigate('/admin/orders')}
+            className="w-full flex items-center justify-between gap-3 bg-rose-50 border border-rose-200 rounded-sm px-4 py-3 text-left hover:bg-rose-100 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <Bell size={15} className="text-rose-500 shrink-0" />
+              <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
+                {pendingCount} შეკვეთა ელოდება დამუშავებას
+              </span>
+            </div>
+            <ChevronRight size={14} className="text-rose-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        )}
+
+        {/* Stock alerts */}
+        <StockAlerts />
+      </div>
+
+      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="font-display text-xl">
           Analytics
@@ -79,7 +113,8 @@ const AdminAnalytics = () => {
               label="Revenue"
               value={`₾${kpis.totalRevenue.toFixed(2)}`}
               icon={Banknote}
-              hint={hint}
+              hint={RANGE_VS[range] || hint}
+              trend={revenueChange}
             />
             <KPICard
               label="Orders"
