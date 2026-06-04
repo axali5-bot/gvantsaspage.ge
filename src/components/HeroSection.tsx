@@ -3,6 +3,7 @@ import { useRef } from "react";
 import {
   motion,
   useMotionValue,
+  useReducedMotion,
   useSpring,
   useTransform,
   type Variants,
@@ -18,12 +19,11 @@ const containerVariants: Variants = {
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: 0.9, ease: [0.25, 0.1, 0.25, 1] },
   },
 };
 
@@ -213,7 +213,7 @@ function CollectionBadge() {
       <motion.span
         aria-hidden
         animate={{ rotate: 360 }}
-        transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+        transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
         className="absolute inset-[-150%] z-0"
         style={{
           background:
@@ -310,22 +310,24 @@ function ParallaxImage({
   floatOffset: number;
   delay: number;
 }) {
+  const reduced = useReducedMotion();
   const px = useTransform(mouseX, [-0.5, 0.5], [-depth, depth]);
   const py = useTransform(mouseY, [-0.5, 0.5], [-depth, depth]);
-  const springX = useSpring(px, { stiffness: 120, damping: 20 });
-  const springY = useSpring(py, { stiffness: 120, damping: 20 });
+  const springX = useSpring(px, { stiffness: 80, damping: 25 });
+  const springY = useSpring(py, { stiffness: 80, damping: 25 });
+  const safeOffset = reduced ? 0 : floatOffset / 2;
 
   return (
     <motion.div
       style={{ x: springX, y: springY }}
-      initial={{ opacity: 0, scale: 0.9, y: 60 }}
+      initial={{ opacity: 0, scale: 0.95, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay }}
       className={className}
     >
       <motion.div
-        animate={{ y: [-floatOffset / 2, floatOffset / 2, -floatOffset / 2] }}
-        transition={{ duration: floatDuration, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        animate={{ y: [-safeOffset, safeOffset, -safeOffset] }}
+        transition={{ duration: floatDuration + 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         className="group relative h-full w-full"
       >
         <div className="relative h-full w-full overflow-hidden rounded-sm border border-white/60 shadow-[0_30px_70px_-25px_rgba(190,120,130,0.55)]">
@@ -400,16 +402,9 @@ function AnimatedBackground() {
             "repeating-linear-gradient(115deg, transparent 0px, transparent 38px, rgba(212,175,55,0.7) 39px, transparent 40px)",
         }}
       />
-      <motion.div
-        animate={{ x: ["-5%", "5%", "-5%"], y: ["-3%", "4%", "-3%"] }}
-        transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute -top-1/4 left-1/4 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,rgba(244,194,194,0.5),transparent_60%)] blur-3xl"
-      />
-      <motion.div
-        animate={{ x: ["4%", "-6%", "4%"], y: ["2%", "-5%", "2%"] }}
-        transition={{ duration: 26, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute bottom-0 right-1/4 h-[50vh] w-[50vh] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.10),transparent_60%)] blur-3xl"
-      />
+      {/* Static blobs — no animation on blur elements (animated blur-3xl kills GPU) */}
+      <div className="absolute -top-1/4 left-1/4 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,rgba(244,194,194,0.4),transparent_60%)] blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 h-[50vh] w-[50vh] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.08),transparent_60%)] blur-3xl" />
     </div>
   );
 }
