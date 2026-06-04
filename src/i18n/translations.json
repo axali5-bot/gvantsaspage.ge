@@ -32,7 +32,15 @@
       "hero": {
         "title": "Luxury Fragrances",
         "subtitle": "Discover the essence of elegance",
-        "shop_now": "Shop Now"
+        "shop_now": "Shop Now",
+        "explore": "Explore Collection",
+        "description": "Discover the essence of luxury. Exclusive jewelry, signature perfumes, and premium skincare — tailored for those who wear elegance like a second skin.",
+        "stat1_value": "500+",
+        "stat1_label": "Clients",
+        "stat2_value": "120+",
+        "stat2_label": "Perfumes",
+        "stat3_value": "2024",
+        "stat3_label": "Est."
       },
       "admin": {
         "title": "Product Management",
@@ -130,6 +138,17 @@
         "processing": "Processing",
         "completed": "Delivered",
         "cancelled": "Cancelled"
+      },
+      "searchModal": {
+        "placeholder": "Search perfumes, jewelry...",
+        "noResults": "No results found",
+        "popularCategories": "Popular Categories",
+        "explore": "Explore",
+        "curatedForYou": "Curated for You",
+        "productsFound": "Products",
+        "select": "Select",
+        "close": "Close",
+        "premiumDiscovery": "Premium Discovery"
       }
     }
   },
@@ -166,7 +185,15 @@
       "hero": {
         "title": "ლუქსი არომატები",
         "subtitle": "აღმოაჩინე ელეგანტურობის არსი",
-        "shop_now": "შეიძინე ახლა"
+        "shop_now": "შეიძინე ახლა",
+        "explore": "კოლექციის ნახვა",
+        "description": "აღმოაჩინეთ სილამაზის არსი. ექსკლუზიური სამკაულები, ხელმოწერილი პარფიუმები და პრემიუმ კოსმეტიკა — მათთვის, ვინც ელეგანტურობას კანივით ატარებს.",
+        "stat1_value": "500+",
+        "stat1_label": "კლიენტი",
+        "stat2_value": "120+",
+        "stat2_label": "პარფიუმი",
+        "stat3_value": "2024",
+        "stat3_label": "წლიდან"
       },
       "admin": {
         "title": "პროდუქციის მართვა",
@@ -264,6 +291,17 @@
         "processing": "მზადდება",
         "completed": "მიწოდებულია",
         "cancelled": "გაუქმდა"
+      },
+      "searchModal": {
+        "placeholder": "მოძებნეთ სუნამოები, სამკაულები...",
+        "noResults": "შედეგები ვერ მოიძებნა",
+        "popularCategories": "პოპულარული კატეგორიები",
+        "explore": "Explore",
+        "curatedForYou": "თქვენთვის შეორჩეული",
+        "productsFound": "პროდუქტები",
+        "select": "შერჩევა",
+        "close": "დახურვა",
+        "premiumDiscovery": "პრემიუმ მომსახურება"
       }
     }
   },
@@ -300,7 +338,15 @@
       "hero": {
         "title": "Люксовые Ароматы",
         "subtitle": "Откройте сущность элегантности",
-        "shop_now": "Купить сейчас"
+        "shop_now": "Купить сейчас",
+        "explore": "Смотреть коллекцию",
+        "description": "Откройте для себя суть роскоши. Эксклюзивные украшения, фирменные ароматы и премиальный уход — для тех, кто носит элегантность как вторую кожу.",
+        "stat1_value": "500+",
+        "stat1_label": "Клиентов",
+        "stat2_value": "120+",
+        "stat2_label": "Парфюмов",
+        "stat3_value": "2024",
+        "stat3_label": "Осн."
       },
       "admin": {
         "title": "Управление продукцией",
