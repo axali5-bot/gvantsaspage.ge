@@ -35,6 +35,7 @@ const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminCatalogs = lazy(() => import("./pages/admin/AdminCatalogs"));
 const AdminIncomingOrders = lazy(() => import("./pages/admin/AdminIncomingOrders"));
+const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,9 @@ const App = () => (
                   } />
                   <Route path="/admin/incoming-orders" element={
                     <Suspense fallback={<AdminFallback />}><AdminIncomingOrders /></Suspense>
+                  } />
+                  <Route path="/admin/customers" element={
+                    <Suspense fallback={<AdminFallback />}><AdminCustomers /></Suspense>
                   } />
                 </Route>
 
