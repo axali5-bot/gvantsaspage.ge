@@ -9,13 +9,7 @@ interface AIConsultantProps {
 }
 
 const AIConsultant = ({ onClick, isOpen, isTalking: isBotTalking }: AIConsultantProps) => {
-    const [showBubble, setShowBubble] = useState(false);
     const [isIdleTalking, setIsIdleTalking] = useState(false);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setShowBubble(true), 2000);
-        return () => clearTimeout(timer);
-    }, []);
 
     useEffect(() => {
         if (!isOpen && !isBotTalking) {
@@ -31,23 +25,6 @@ const AIConsultant = ({ onClick, isOpen, isTalking: isBotTalking }: AIConsultant
 
     return (
         <div id="ai-avatar-container" className="fixed bottom-6 right-8 z-[999999999] flex flex-col items-end">
-            {/* Speech Bubble */}
-            <AnimatePresence>
-                {showBubble && !isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8, y: 10, x: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.8, y: 10 }}
-                        className="mb-4 bg-white/95 backdrop-blur-md px-5 py-3.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-pink-100/50 relative cursor-pointer group hover:bg-white transition-all z-20"
-                        onClick={(e) => { e.stopPropagation(); onClick(); }}
-                    >
-                        <p className="text-[14px] font-medium text-gray-700 flex items-center gap-2 font-display">
-                            რით შემიძლია დაგეხმაროთ? <motion.span animate={{ rotate: [0, 20, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>✨</motion.span>
-                        </p>
-                        <div className="absolute -bottom-2 right-5 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white group-hover:border-t-white transition-colors" />
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
             {/* Chat Button (2026 Style) */}
             <motion.button
