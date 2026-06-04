@@ -70,7 +70,7 @@ export const HeroSection = () => {
         </motion.span>
       </div>
 
-      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10 pt-28 pb-28 lg:pt-32 lg:pb-24">
+      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10 pt-28 pb-28 lg:pt-40 lg:pb-24">
         {/* LEFT — Typography & CTA */}
         <motion.div
           variants={containerVariants}
@@ -126,6 +126,7 @@ export const HeroSection = () => {
           onMouseLeave={handleMouseLeave}
           className="order-1 lg:order-2 relative h-[44vh] sm:h-[55vh] lg:h-[80vh] w-full flex items-center justify-center"
         >
+          {/* Perfume — large, center anchor */}
           <ParallaxImage
             src="/images/blush-perfume.png"
             alt="Signature Eau de Parfum"
@@ -133,11 +134,12 @@ export const HeroSection = () => {
             mouseX={mouseX}
             mouseY={mouseY}
             depth={22}
-            className="absolute z-20 w-[52%] aspect-[3/4] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            className="absolute z-20 w-[48%] aspect-[3/4] left-[18%] top-1/2 -translate-y-1/2"
             floatDuration={6}
-            floatOffset={20}
+            floatOffset={18}
             delay={0.4}
           />
+          {/* Jewelry — overlaps top-right of perfume */}
           <ParallaxImage
             src="/images/blush-jewelry.png"
             alt="Fine Jewelry"
@@ -145,11 +147,12 @@ export const HeroSection = () => {
             mouseX={mouseX}
             mouseY={mouseY}
             depth={42}
-            className="absolute z-30 w-[40%] aspect-[3/4] right-[0%] top-[2%]"
+            className="absolute z-30 w-[42%] aspect-[3/4] right-[0%] top-[8%]"
             floatDuration={7.5}
-            floatOffset={28}
+            floatOffset={26}
             delay={0.6}
           />
+          {/* Skincare — overlaps bottom-left of perfume */}
           <ParallaxImage
             src="/images/blush-skincare.png"
             alt="Radiance Serum"
@@ -157,9 +160,9 @@ export const HeroSection = () => {
             mouseX={mouseX}
             mouseY={mouseY}
             depth={14}
-            className="absolute z-10 w-[36%] aspect-[3/4] left-[0%] bottom-[2%]"
+            className="absolute z-10 w-[34%] aspect-[3/4] left-[2%] bottom-[8%]"
             floatDuration={9}
-            floatOffset={16}
+            floatOffset={14}
             delay={0.8}
           />
 
