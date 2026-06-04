@@ -1,3 +1,4 @@
+/* stylelint-disable at-rule-no-unknown */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
 
 @tailwind base;
@@ -52,6 +53,9 @@
     --gold-soft: 43 55% 68%;
     --gold-deep: 43 75% 38%;
     --gold-foreground: 30 15% 10%;
+
+    --luxury-glass: 0 0% 100% / 0.1;
+    --luxury-blur: 12px;
   }
 
   .dark {
@@ -126,6 +130,43 @@
 
   .font-body {
     font-family: var(--font-body);
+  }
+
+  /* Luxury Utility Classes */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(var(--luxury-blur));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, hsl(var(--gold-soft)) 0%, hsl(var(--gold)) 50%, hsl(var(--gold-deep)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .luxury-border {
+    position: relative;
+  }
+
+  .luxury-border::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold)), transparent);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .luxury-border:hover::after {
+    width: 100%;
   }
 
   .perspective-1000 {

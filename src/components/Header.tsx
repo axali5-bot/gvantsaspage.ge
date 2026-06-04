@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Search, ShoppingBag, Menu, X, Home, BookOpen, Info, Phone, ChevronDown, Globe } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartSheet } from './CartSheet';
 import { useCategories } from '@/hooks/useCategories';
 import UserMenu from './UserMenu';
+import { SearchModal } from './SearchModal';
 
 const languages = [
   { code: 'ka', label: 'ქარ' },
@@ -136,29 +135,14 @@ export const Header = ({ onSearch }: HeaderProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center lg:gap-8">
-            {/* Search */}
+            {/* Search Trigger */}
             <div className="relative">
-              {isSearchOpen ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="text"
-                    placeholder={t('search')}
-                    className="w-48 h-9 font-body text-sm"
-                    onChange={(e) => onSearch(e.target.value)}
-                    autoFocus
-                  />
-                  <button onClick={() => setIsSearchOpen(false)}>
-                    <X size={18} className="text-muted-foreground" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="p-2 hover:text-accent transition-colors"
-                >
-                  <Search size={20} />
-                </button>
-              )}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-3 hover:text-rose-600 transition-all duration-300 rounded-full hover:bg-rose-500/5 group"
+              >
+                <Search size={22} className="group-hover:scale-110 transition-transform" />
+              </button>
             </div>
 
 
@@ -284,17 +268,20 @@ export const Header = ({ onSearch }: HeaderProps) => {
                 transition={{ delay: 0.6 }}
                 className="space-y-8"
               >
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-muted-foreground" />
+                <button 
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full relative group"
+                >
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-rose-500/50" />
                   </div>
-                  <Input
-                    type="text"
-                    placeholder={t('search')}
-                    className="pl-10 h-12 bg-secondary/50 border-none rounded-2xl focus-visible:ring-rose-500/30"
-                    onChange={(e) => onSearch(e.target.value)}
-                  />
-                </div>
+                  <div className="w-full h-14 bg-secondary/50 border border-border/20 rounded-2xl flex items-center pl-12 text-muted-foreground/60 font-body text-sm tracking-widest">
+                    {t('search')}...
+                  </div>
+                </button>
 
                 <div className="flex flex-col gap-4">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-medium pl-1">
@@ -331,6 +318,11 @@ export const Header = ({ onSearch }: HeaderProps) => {
           </motion.div >
         )}
       </AnimatePresence >
+
+      <SearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
 
     </header >
   );
