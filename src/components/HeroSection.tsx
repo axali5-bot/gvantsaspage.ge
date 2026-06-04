@@ -58,41 +58,6 @@ export const HeroSection = () => {
       <GrainOverlay />
       <CornerFrame />
 
-      {/* Top brand bar — exactly as original, AVON2FLAME branding */}
-      <div className="absolute top-0 left-0 right-0 z-20">
-        <div className="container mx-auto px-6 py-8 flex items-center justify-between">
-          <motion.span
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="font-serif text-xl tracking-[0.3em] uppercase text-slate-900"
-          >
-            avon<span className="text-[#D4AF37]">2</span>flame
-          </motion.span>
-          <motion.nav
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.15, ease: "easeOut" }}
-            className="hidden md:flex items-center gap-10 font-sans text-[11px] uppercase tracking-[0.25em] text-slate-500"
-          >
-            {[
-              { label: "Jewelry", id: "products" },
-              { label: "Perfume", id: "products" },
-              { label: "Catalog", id: "catalog" },
-            ].map(({ label, id }) => (
-              <button
-                key={label}
-                onClick={() => handleScroll(id)}
-                className="group relative py-1 transition-colors duration-300 hover:text-[#B8941F] bg-transparent border-none cursor-pointer"
-              >
-                {label}
-                <span className="absolute bottom-0 left-0 h-px w-0 bg-[#D4AF37] transition-all duration-300 group-hover:w-full" />
-              </button>
-            ))}
-          </motion.nav>
-        </div>
-      </div>
-
       {/* Vertical editorial side label */}
       <div className="pointer-events-none absolute left-6 top-1/2 -translate-y-1/2 z-20 hidden xl:block">
         <motion.span
@@ -105,7 +70,7 @@ export const HeroSection = () => {
         </motion.span>
       </div>
 
-      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10 pt-28 pb-28 lg:pt-44 lg:pb-24">
+      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10 pt-16 pb-16 lg:pt-16 lg:pb-16">
         {/* LEFT — Typography & CTA */}
         <motion.div
           variants={containerVariants}
