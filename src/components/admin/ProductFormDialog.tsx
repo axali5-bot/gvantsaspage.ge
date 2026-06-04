@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { useCreateProduct, useUpdateProduct, Product, ProductInput } from '@/hooks/useProducts';
@@ -57,6 +57,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [aiFilling, setAiFilling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, reset, watch, setValue, control, formState: { errors } } = useForm<FormValues>({
@@ -112,6 +113,31 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
     const kaDesc = watch('description_ka');
     setValue(`name_${lang}`, kaName);
     setValue(`description_${lang}`, kaDesc);
+  };
+
+  const handleAiFill = async () => {
+    const name_ka = watch('name_ka')?.trim();
+    const image_url = isEdit ? product?.image_url : null;
+    if (!name_ka) { toast.error('ჯერ შეიყვანე სახელი ქართულად'); return; }
+    setAiFilling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-product-fill', {
+        body: { name_ka, image_url: image_url ?? null },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      // fill only empty fields — don't overwrite what admin already typed
+      if (data.name_en && !watch('name_en'))         setValue('name_en', data.name_en);
+      if (data.name_ru && !watch('name_ru'))         setValue('name_ru', data.name_ru);
+      if (data.description_ka && !watch('description_ka')) setValue('description_ka', data.description_ka);
+      if (data.description_en && !watch('description_en')) setValue('description_en', data.description_en);
+      if (data.description_ru && !watch('description_ru')) setValue('description_ru', data.description_ru);
+      toast.success('✨ AI-მა შეავსო — შეამოწმე და ჩაასწორე');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'AI ვერ მუშაობს');
+    } finally {
+      setAiFilling(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,9 +227,23 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-background max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">
-            {isEdit ? 'Edit Product' : 'Add New Product'}
-          </DialogTitle>
+          <div className="flex items-center justify-between gap-3">
+            <DialogTitle className="font-display">
+              {isEdit ? 'Edit Product' : 'Add New Product'}
+            </DialogTitle>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAiFill}
+              disabled={aiFilling || !watch('name_ka')?.trim()}
+              className="shrink-0 gap-1.5 border-violet-200 text-violet-700 hover:bg-violet-50 hover:border-violet-300 disabled:opacity-40"
+            >
+              {aiFilling
+                ? <><Loader2 size={13} className="animate-spin" /> AI ფიქრობს...</>
+                : <><Sparkles size={13} /> AI-ით შევსება</>}
+            </Button>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
