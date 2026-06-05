@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { User, Phone, MapPin, ShoppingBag, LogOut, ChevronRight } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { ReferralCard } from '@/components/account/ReferralCard';
+import { PointsHistory } from '@/components/account/PointsHistory';
 
 const Account = () => {
   const { user, profile, signOut, refreshProfile, isAdmin } = useAuth();
@@ -181,6 +182,9 @@ const Account = () => {
 
           {/* Loyalty points + referral */}
           <ReferralCard />
+
+          {/* Points ledger */}
+          <PointsHistory />
 
           {/* Orders */}
           <Link to="/account/orders" className="block bg-white rounded-[1.5rem] border border-rose-100 shadow-sm p-8 hover:shadow-md hover:border-rose-200 transition-all group">
