@@ -60,6 +60,18 @@ const Checkout = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate Georgian phone (9 digits, optional +995) and a real address
+        const phoneClean = formData.phone.replace(/[\s-]/g, '');
+        if (!/^(\+?995)?\d{9}$/.test(phoneClean)) {
+            toast.error('ტელეფონის ნომერი არასწორია (მაგ: 555 12 34 56)');
+            return;
+        }
+        if (formData.address.trim().length < 5) {
+            toast.error('გთხოვთ მიუთითოთ სრული მისამართი');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
 

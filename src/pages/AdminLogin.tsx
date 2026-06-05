@@ -72,7 +72,10 @@ const AdminLogin = () => {
             {loading ? 'Signing in...' : 'Access Dashboard'}
           </Button>
         </form>
-        <div className="text-center pt-4">
+        <div className="text-center pt-4 space-y-3">
+          <Link to="/auth/forgot-password" className="block text-xs text-muted-foreground hover:text-primary transition-colors">
+            Forgot password?
+          </Link>
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1">
             <ArrowLeft size={12} /> Back to Store
           </Link>
