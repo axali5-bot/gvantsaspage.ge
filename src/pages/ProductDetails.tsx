@@ -1,22 +1,34 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useProduct } from "@/hooks/useProducts";
+import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ShoppingBag, Info, ShieldCheck, Truck } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Info, ShieldCheck, Truck, Zap, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import SEO from "@/components/SEO";
 import { trackViewContent, trackAddToCart } from "@/utils/analytics";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { ProductGrid } from "@/components/ProductGrid";
 
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { data: product, isLoading: loading, error } = useProduct(id);
+    const { data: allProducts } = useProducts();
     const { addToCart } = useCart();
+    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { t, i18n } = useTranslation();
+
+    const relatedProducts = useMemo(() => {
+        if (!allProducts || !product) return [];
+        return allProducts
+            .filter((p) => p.id !== product.id)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 4);
+    }, [allProducts, product]);
 
     useEffect(() => {
         if (product) {
@@ -27,6 +39,23 @@ const ProductDetails = () => {
     const handleAddToCart = (p: any) => {
         addToCart(p);
         trackAddToCart(p);
+    };
+
+    const handleBuyNow = (p: any) => {
+        addToCart(p);
+        trackAddToCart(p);
+        navigate('/checkout');
+    };
+
+    const isWished = product ? isInWishlist(product.id) : false;
+
+    const toggleWishlist = () => {
+        if (!product) return;
+        if (isWished) {
+            removeFromWishlist(product.id);
+        } else {
+            addToWishlist(product);
+        }
     };
 
     if (loading) {
@@ -110,10 +139,19 @@ const ProductDetails = () => {
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                         className="lg:col-span-7 flex flex-col h-full pl-0 lg:pl-10"
                     >
-                        <div className="mb-8">
-                            <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-foreground mb-4 leading-none uppercase">
+                        <div className="mb-8 relative">
+                            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium tracking-wide text-foreground mb-4 leading-tight uppercase pr-16">
                                 {localizedName}
                             </h1>
+                            <button
+                                onClick={toggleWishlist}
+                                className="absolute top-0 right-0 p-3 rounded-full hover:bg-rose-50 transition-colors duration-300 group/wishlist border border-transparent hover:border-rose-100"
+                            >
+                                <Heart 
+                                    size={28} 
+                                    className={`transition-all duration-300 ${isWished ? 'fill-rose-500 text-rose-500 scale-110' : 'text-muted-foreground/50 group-hover/wishlist:text-rose-500 group-hover/wishlist:scale-110'}`} 
+                                />
+                            </button>
                             <div className="flex items-center gap-4">
                                 <p className="font-display text-2xl md:text-4xl text-gold font-light">
                                     {product.price} ₾
@@ -158,25 +196,48 @@ const ProductDetails = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.5 }}
-                            className="mt-auto pt-8"
+                            className="mt-auto pt-8 flex flex-col sm:flex-row gap-4"
                         >
                             <Button
                                 onClick={() => handleAddToCart(product)}
-                                className="w-full h-16 uppercase tracking-[0.4em] text-[11px] font-body bg-gradient-to-r from-rose-200 via-pink-400 to-rose-200 text-black hover:from-rose-300 hover:via-pink-500 hover:to-rose-300 transition-all duration-500 flex items-center justify-center gap-3 border border-rose-500/30 shadow-[0_10px_40px_rgba(225,29,72,0.2)] hover:shadow-[0_15px_60px_rgba(225,29,72,0.4)] hover:scale-[1.02] active:scale-95 font-bold"
+                                className="w-full sm:flex-1 h-14 tracking-widest text-xs font-body bg-secondary/80 text-foreground hover:bg-secondary transition-all duration-300 flex items-center justify-center gap-3 border border-border"
                             >
-                                <ShoppingBag size={20} />
+                                <ShoppingBag size={18} />
                                 {t('addToCart', { defaultValue: 'Add to Cart' })}
+                            </Button>
+
+                            <Button
+                                onClick={() => handleBuyNow(product)}
+                                className="w-full sm:flex-1 h-14 uppercase tracking-[0.3em] text-xs font-body bg-gradient-to-r from-rose-200 via-rose-400 to-rose-200 text-black hover:from-rose-300 hover:via-rose-500 hover:to-rose-300 transition-all duration-500 flex items-center justify-center gap-3 border border-rose-500/30 shadow-[0_10px_40px_rgba(225,29,72,0.2)] hover:shadow-[0_15px_60px_rgba(225,29,72,0.4)] hover:scale-[1.02] active:scale-95 font-bold"
+                            >
+                                <Zap size={18} className="fill-black" />
+                                {t('buyNow', { defaultValue: 'Buy Now' })}
                             </Button>
                         </motion.div>
                     </motion.div>
                 </div>
+
+                {/* Related Products */}
+                {relatedProducts.length > 0 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="mt-24 pt-16 border-t border-border/40"
+                    >
+                        <h2 className="font-display text-xl lg:text-3xl tracking-[0.2em] uppercase text-center mb-12">
+                            {t('youMayAlsoLike', { defaultValue: 'You May Also Like' })}
+                        </h2>
+                        <ProductGrid products={relatedProducts} />
+                    </motion.div>
+                )}
             </main>
 
             {/* Footer */}
             <footer className="border-t border-border py-12 mt-12 text-center opacity-80">
                 <div className="container mx-auto px-4">
-                    <p className="font-display text-xl tracking-[0.3em] text-foreground mb-3">
-                        AVON2FLAME
+                    <p className="font-display text-xl tracking-[0.3em] text-foreground mb-3 lowercase">
+                        gvantsa's page
                     </p>
                     <p className="font-body text-[10px] text-muted-foreground tracking-[0.2em] uppercase">
                         © 2024 All Rights Reserved

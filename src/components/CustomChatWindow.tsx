@@ -26,7 +26,8 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
     // Initialize chat session on first open
     useEffect(() => {
         if (isOpen && messages.length === 0) {
-            startGeminiChat();
+            // Kicks off loading the live product catalog into the chat context.
+            void startGeminiChat();
             // Optional: send an initial greeting
             setMessages([{ id: "welcome", text: "გამარჯობა! მე ვარ Gvantsa's ასისტენტი ✨ რით შემიძლია დაგეხმაროთ?", sender: "bot" }]);
         }

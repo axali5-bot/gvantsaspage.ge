@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Search, ShoppingBag, Menu, X, Home, BookOpen, Info, Phone, ChevronDown, Globe } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, Home, BookOpen, Info, Phone, ChevronDown, Globe, Heart } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CartSheet } from './CartSheet';
 import { useCategories } from '@/hooks/useCategories';
@@ -115,8 +115,8 @@ export const Header = ({ onSearch }: HeaderProps) => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <a href="/" onClick={handleHomeClick} className="flex flex-col group">
-              <h1 className="font-display text-2xl md:text-3xl font-light tracking-[0.3em] text-foreground transition-all duration-500 group-hover:tracking-[0.4em] group-hover:text-rose-600">
-                AVON<span className="font-semibold text-gold group-hover:text-gold-deep transition-colors duration-300">2</span>FLAME
+              <h1 className="font-display text-2xl md:text-3xl font-light tracking-[0.2em] text-foreground transition-all duration-500 group-hover:tracking-[0.25em] group-hover:text-rose-600 lowercase">
+                gvantsa's <span className="font-semibold text-gold group-hover:text-gold-deep transition-colors duration-300">page</span>
               </h1>
               <div className="h-[1px] w-0 bg-gold/30 transition-all duration-700 group-hover:w-full" />
             </a>
@@ -199,11 +199,15 @@ export const Header = ({ onSearch }: HeaderProps) => {
 
           </nav>
 
-          {/* Mobile: UserMenu + Cart */}
+            {/* Mobile: UserMenu + Cart + Wishlist */}
           <div className="flex items-center gap-2">
             <div className="lg:hidden">
               <UserMenu />
             </div>
+            <Link to="/wishlist" className="p-2 text-foreground/80 hover:text-rose-600 transition-colors relative group">
+                <Heart size={22} className="group-hover:scale-110 transition-transform" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full scale-0 transition-transform group-hover:scale-100" />
+            </Link>
             <CartSheet />
           </div>
         </div>

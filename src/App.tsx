@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import ProductDetails from "./pages/ProductDetails";
 import Catalog from "./pages/Catalog";
 import Checkout from "./pages/Checkout";
+import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
@@ -19,6 +20,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import { CartProvider } from "./hooks/useCart";
 import { AuthProvider } from "./hooks/useAuth";
+import { WishlistProvider } from "./hooks/useWishlist";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { ProtectedCustomerRoute } from "./components/ProtectedCustomerRoute";
 import "@/i18n";
@@ -50,75 +52,78 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <ChatWidget />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
+          <WishlistProvider>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <ChatWidget />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
 
-                {/* Lazy-loaded admin routes — NOT in customer bundle */}
-                <Route
-                  element={
-                    <ProtectedAdminRoute>
-                      <Suspense fallback={<AdminFallback />}>
-                        <AdminLayout />
-                      </Suspense>
-                    </ProtectedAdminRoute>
-                  }
-                >
-                  <Route path="/admin" element={<Navigate to="/admin/analytics" replace />} />
-                  <Route path="/admin/analytics" element={
-                    <Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>
-                  } />
-                  <Route path="/admin/products" element={
-                    <Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>
-                  } />
-                  <Route path="/admin/orders" element={
-                    <Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>
-                  } />
-                  <Route path="/admin/categories" element={
-                    <Suspense fallback={<AdminFallback />}><AdminCategories /></Suspense>
-                  } />
-                  <Route path="/admin/catalogs" element={
-                    <Suspense fallback={<AdminFallback />}><AdminCatalogs /></Suspense>
-                  } />
-                  <Route path="/admin/incoming-orders" element={
-                    <Suspense fallback={<AdminFallback />}><AdminIncomingOrders /></Suspense>
-                  } />
-                  <Route path="/admin/customers" element={
-                    <Suspense fallback={<AdminFallback />}><AdminCustomers /></Suspense>
-                  } />
-                </Route>
+                  {/* Lazy-loaded admin routes — NOT in customer bundle */}
+                  <Route
+                    element={
+                      <ProtectedAdminRoute>
+                        <Suspense fallback={<AdminFallback />}>
+                          <AdminLayout />
+                        </Suspense>
+                      </ProtectedAdminRoute>
+                    }
+                  >
+                    <Route path="/admin" element={<Navigate to="/admin/analytics" replace />} />
+                    <Route path="/admin/analytics" element={
+                      <Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>
+                    } />
+                    <Route path="/admin/products" element={
+                      <Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>
+                    } />
+                    <Route path="/admin/orders" element={
+                      <Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>
+                    } />
+                    <Route path="/admin/categories" element={
+                      <Suspense fallback={<AdminFallback />}><AdminCategories /></Suspense>
+                    } />
+                    <Route path="/admin/catalogs" element={
+                      <Suspense fallback={<AdminFallback />}><AdminCatalogs /></Suspense>
+                    } />
+                    <Route path="/admin/incoming-orders" element={
+                      <Suspense fallback={<AdminFallback />}><AdminIncomingOrders /></Suspense>
+                    } />
+                    <Route path="/admin/customers" element={
+                      <Suspense fallback={<AdminFallback />}><AdminCustomers /></Suspense>
+                    } />
+                  </Route>
 
-                {/* Auth routes */}
-                <Route path="/auth/signup" element={<Signup />} />
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                  {/* Auth routes */}
+                  <Route path="/auth/signup" element={<Signup />} />
+                  <Route path="/auth/login" element={<Login />} />
+                  <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-                {/* Protected customer routes */}
-                <Route element={<ProtectedCustomerRoute />}>
-                  <Route path="/account" element={
-                    <Suspense fallback={<AdminFallback />}><Account /></Suspense>
-                  } />
-                  <Route path="/account/orders" element={
-                    <Suspense fallback={<AdminFallback />}><CustomerOrders /></Suspense>
-                  } />
-                </Route>
+                  {/* Protected customer routes */}
+                  <Route element={<ProtectedCustomerRoute />}>
+                    <Route path="/account" element={
+                      <Suspense fallback={<AdminFallback />}><Account /></Suspense>
+                    } />
+                    <Route path="/account/orders" element={
+                      <Suspense fallback={<AdminFallback />}><CustomerOrders /></Suspense>
+                    } />
+                  </Route>
 
-                <Route path="/about" element={<AboutUs />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/catalog" element={<Catalog />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </CartProvider>
+                  <Route path="/about" element={<AboutUs />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/catalog" element={<Catalog />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </CartProvider>
+          </WishlistProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

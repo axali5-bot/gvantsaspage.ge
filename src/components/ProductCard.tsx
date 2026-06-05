@@ -5,7 +5,9 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Heart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +17,7 @@ interface ProductCardProps {
 export const ProductCard = ({ product, index }: ProductCardProps) => {
   const { t, i18n } = useTranslation();
   const { addToCart } = useCart();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -23,6 +26,18 @@ export const ProductCard = ({ product, index }: ProductCardProps) => {
 
   const currentLang = i18n.language || 'ka';
   const localizedName = (product[`name_${currentLang}` as keyof Product] || product.name) as string;
+
+  const isWished = isInWishlist(product.id);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isWished) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
 
   // Directional animation logic
   const getInitialAnimation = () => {
@@ -184,6 +199,18 @@ export const ProductCard = ({ product, index }: ProductCardProps) => {
             <div className="absolute bottom-[30%] left-[25%] w-1 h-1 bg-pink-200 rounded-full animate-sparkle" style={{ animationDelay: '0.6s' }} />
           </div>
         </Link>
+
+        {/* Wishlist Button */}
+        <button
+          onClick={toggleWishlist}
+          className="absolute top-4 right-4 z-30 p-2.5 rounded-full bg-white/60 backdrop-blur-md border border-white/80 hover:bg-white/80 transition-all duration-300 group/wishlist shadow-lg"
+          style={{ transform: 'translateZ(30px)' }}
+        >
+          <Heart 
+            size={18} 
+            className={`transition-all duration-300 ${isWished ? 'fill-rose-500 text-rose-500 scale-110 drop-shadow-md' : 'text-neutral-700 group-hover/wishlist:text-rose-500 group-hover/wishlist:scale-110'}`} 
+          />
+        </button>
 
         {/* Product Info */}
         <div
