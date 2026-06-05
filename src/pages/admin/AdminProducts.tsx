@@ -35,21 +35,28 @@ export const AdminProducts = () => {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkSync, setBulkSync] = useState<BulkSyncState | null>(null);
 
+  // Products that still need pushing: never synced, or changed since (dirty/error)
+  const unsyncedProducts = products.filter((p) => syncMap.get(p.id)?.status !== 'synced');
+
   const handleBulkSync = async () => {
-    if (products.length === 0) return;
-    setBulkSync({ running: true, done: 0, total: products.length, errors: 0 });
-    let errors = 0;
-    for (let i = 0; i < products.length; i++) {
-      const result = await syncProduct(products[i]);
-      if (!result.ok) errors++;
-      setBulkSync({ running: true, done: i + 1, total: products.length, errors });
+    const toSync = unsyncedProducts;
+    if (toSync.length === 0) {
+      toast.info('ყველა პროდუქტი უკვე დასინქრონებულია ✓');
+      return;
     }
-    setBulkSync({ running: false, done: products.length, total: products.length, errors });
+    setBulkSync({ running: true, done: 0, total: toSync.length, errors: 0 });
+    let errors = 0;
+    for (let i = 0; i < toSync.length; i++) {
+      const result = await syncProduct(toSync[i]);
+      if (!result.ok) errors++;
+      setBulkSync({ running: true, done: i + 1, total: toSync.length, errors });
+    }
+    setBulkSync({ running: false, done: toSync.length, total: toSync.length, errors });
     await qc.invalidateQueries({ queryKey: SYNC_KEY });
     if (errors === 0) {
-      toast.success(`✓ ${products.length} პროდუქტი გაიგზავნა samkaulebi-ზე`);
+      toast.success(`✓ ${toSync.length} ახალი პროდუქტი გაიგზავნა samkaulebi-ზე`);
     } else {
-      toast.warning(`${products.length - errors} გაიგზავნა, ${errors} შეცდომა`);
+      toast.warning(`${toSync.length - errors} გაიგზავნა, ${errors} შეცდომა`);
     }
     setTimeout(() => setBulkSync(null), 4000);
   };
@@ -97,7 +104,7 @@ export const AdminProducts = () => {
               className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
             >
               <Send size={14} className="mr-1" />
-              samkaulebi-ზე გაგზავნა
+              samkaulebi-ზე გაგზავნა{unsyncedProducts.length > 0 ? ` (${unsyncedProducts.length})` : ''}
             </Button>
           )}
 
