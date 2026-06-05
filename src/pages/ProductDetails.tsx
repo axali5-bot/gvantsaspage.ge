@@ -12,6 +12,7 @@ import { trackViewContent, trackAddToCart } from "@/utils/analytics";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ProductGrid } from "@/components/ProductGrid";
+import { ProductReviews } from "@/components/ProductReviews";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -216,6 +217,9 @@ const ProductDetails = () => {
                         </motion.div>
                     </motion.div>
                 </div>
+
+                {/* Customer Reviews */}
+                <ProductReviews productId={product.id} />
 
                 {/* Related Products */}
                 {relatedProducts.length > 0 && (
