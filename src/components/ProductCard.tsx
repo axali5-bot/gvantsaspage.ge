@@ -7,7 +7,8 @@ import { Product } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Heart } from 'lucide-react';
+import { useProductRatings } from '@/hooks/useProductRatings';
+import { Heart, Star } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -28,6 +29,8 @@ export const ProductCard = ({ product, index }: ProductCardProps) => {
   const localizedName = (product[`name_${currentLang}` as keyof Product] || product.name) as string;
 
   const isWished = isInWishlist(product.id);
+  const { data: ratings } = useProductRatings();
+  const rating = ratings?.get(product.id);
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -224,6 +227,18 @@ export const ProductCard = ({ product, index }: ProductCardProps) => {
               {localizedName}
             </h3>
           </Link>
+          {rating && rating.count > 0 && (
+            <div className="flex items-center justify-center gap-0.5 mb-2">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Star
+                  key={n}
+                  size={11}
+                  className={n <= Math.round(rating.avg) ? 'fill-gold text-gold' : 'fill-muted text-muted/40'}
+                />
+              ))}
+              <span className="text-[10px] text-muted-foreground ml-1">({rating.count})</span>
+            </div>
+          )}
           <p className="font-body text-sm font-bold text-gold mt-auto tracking-wider transition-all duration-500 group-hover:scale-110 group-hover:text-gold-deep">
             {product.price} ₾
           </p>
