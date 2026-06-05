@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { CheckCircle2, ChevronLeft } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Sparkles, Gift } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useTranslation } from "react-i18next";
 import SEO from "@/components/SEO";
@@ -27,6 +27,13 @@ const Checkout = () => {
         phone: "",
         address: "",
     });
+    const [redeemPoints, setRedeemPoints] = useState(false);
+
+    // Loyalty redemption: 1 point = 1₾, capped at the order total
+    const points = profile?.points ?? 0;
+    const redeemable = Math.min(points, Math.floor(totalPrice));
+    const discount = redeemPoints ? redeemable : 0;
+    const finalTotal = totalPrice - discount;
 
     // Pre-fill form from profile if logged in
     useEffect(() => {
@@ -65,6 +72,7 @@ const Checkout = () => {
                     quantity: item.quantity
                 })),
                 p_user_id: user?.id ?? null,
+                p_redeem_points: discount,
             });
 
             if (rpcError) throw rpcError;
@@ -75,8 +83,9 @@ const Checkout = () => {
                     .from('profiles')
                     .update({ default_address: formData.address, updated_at: new Date().toISOString() })
                     .eq('id', user.id);
-                await refreshProfile();
             }
+            // Refresh points balance — redemption is deducted immediately
+            if (user) await refreshProfile();
 
             setIsOrdered(true);
 
@@ -146,6 +155,31 @@ const Checkout = () => {
                             <p className="font-body text-sm text-muted-foreground">{t('checkout.subtitle')}</p>
                         </div>
 
+                        {/* Guest → register incentive */}
+                        {!user && (
+                            <Link
+                                to="/auth/signup"
+                                className="block rounded-2xl border border-gold/30 bg-gradient-to-r from-rose-50 to-amber-50/60 p-5 hover:shadow-md transition-all group"
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-tr from-gold to-amber-400 flex items-center justify-center text-white">
+                                        <Sparkles size={17} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-display text-sm font-medium text-gray-800">
+                                            შექმენი ანგარიში და მიიღე <span className="text-rose-600">5₾ საჩუქრად</span>
+                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            + დააგროვე ყოველ შეკვეთაზე 5% და მოიწვie მეგობრები ბონუსებისთვის.
+                                        </p>
+                                    </div>
+                                    <span className="shrink-0 self-center text-xs font-semibold text-rose-500 group-hover:translate-x-0.5 transition-transform whitespace-nowrap">
+                                        რეგისტრაცia →
+                                    </span>
+                                </div>
+                            </Link>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name" className="text-xs uppercase tracking-widest">{t('checkout.fullName')}</Label>
@@ -188,7 +222,7 @@ const Checkout = () => {
                                 disabled={isSubmitting}
                                 className="w-full h-14 uppercase tracking-[0.2em] text-[11px] font-body bg-gradient-to-r from-gold-deep via-gold to-gold-soft text-gold-foreground hover:from-gold hover:via-gold-soft hover:to-gold transition-all duration-500 rounded-none border border-gold/40 shadow-[0_0_20px_rgba(212,175,55,0.25)] hover:shadow-[0_0_35px_rgba(212,175,55,0.45)] font-semibold"
                             >
-                                {isSubmitting ? t('checkout.processing') : `${t('checkout.placeOrder')} — ${totalPrice} ₾`}
+                                {isSubmitting ? t('checkout.processing') : `${t('checkout.placeOrder')} — ${finalTotal} ₾`}
                             </Button>
                         </form>
                     </div>
@@ -216,9 +250,35 @@ const Checkout = () => {
                                 <span>{t('checkout.shipping')}</span>
                                 <span className="text-green-600 font-medium uppercase text-[10px] tracking-widest">{t('checkout.free')}</span>
                             </div>
+
+                            {/* Points redemption (logged-in users with a usable balance) */}
+                            {user && redeemable > 0 && (
+                                <label className="flex items-center justify-between gap-3 cursor-pointer rounded-xl bg-rose-50/70 border border-rose-100 p-3 mt-1">
+                                    <span className="flex items-center gap-2 text-sm font-body text-rose-600">
+                                        <Gift size={15} />
+                                        გამოვიყeno {redeemable} ქულა
+                                    </span>
+                                    <span className="flex items-center gap-2">
+                                        <span className="text-xs text-rose-500 font-medium">−{redeemable} ₾</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={redeemPoints}
+                                            onChange={(e) => setRedeemPoints(e.target.checked)}
+                                            className="w-4 h-4 accent-rose-500"
+                                        />
+                                    </span>
+                                </label>
+                            )}
+                            {discount > 0 && (
+                                <div className="flex justify-between items-center text-sm font-body text-rose-600">
+                                    <span>ფასდაკლება (ქულები)</span>
+                                    <span>−{discount} ₾</span>
+                                </div>
+                            )}
+
                             <div className="flex justify-between items-center pt-4 font-display text-xl font-semibold">
                                 <span>{t('total')}</span>
-                                <span>{totalPrice} ₾</span>
+                                <span>{finalTotal} ₾</span>
                             </div>
                         </div>
                     </div>

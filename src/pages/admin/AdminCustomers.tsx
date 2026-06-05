@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import { Input } from '@/components/ui/input';
 import { Phone, MapPin, ShoppingBag, TrendingUp, Users, Star } from 'lucide-react';
+import { LoyaltyPanel } from '@/components/admin/LoyaltyPanel';
 
 interface Customer {
   key: string;            // phone or name (dedup key)
@@ -188,6 +189,9 @@ export const AdminCustomers = () => {
           </table>
         </div>
       )}
+
+      {/* Registered customers: points + referrals */}
+      <LoyaltyPanel />
     </div>
   );
 };
