@@ -1,11 +1,15 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
+import { captureReferralFromUrl, getStoredReferralCode, clearStoredReferralCode } from '@/lib/referral';
 
 export interface ProfileData {
   full_name: string | null;
   phone: string | null;
   default_address: string | null;
+  points: number;
+  referral_code: string | null;
+  referred_by: string | null;
 }
 
 interface AuthContextType {
@@ -37,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     const { data } = await supabase
       .from('profiles')
-      .select('is_admin, full_name, phone, default_address')
+      .select('is_admin, full_name, phone, default_address, points, referral_code, referred_by')
       .eq('id', uid)
       .maybeSingle();
     setIsAdmin(!!data?.is_admin);
@@ -45,6 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       full_name: data.full_name ?? null,
       phone: data.phone ?? null,
       default_address: data.default_address ?? null,
+      points: data.points ?? 0,
+      referral_code: data.referral_code ?? null,
+      referred_by: data.referred_by ?? null,
     } : null);
   };
 
@@ -54,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let cancelled = false;
+    captureReferralFromUrl(); // stash ?ref=CODE before the visitor navigates to signup
 
     const init = async () => {
       try {
@@ -102,11 +110,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    const referralCode = getStoredReferralCode();
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: {
+        data: {
+          full_name: fullName,
+          ...(referralCode ? { referral_code_used: referralCode } : {}),
+        },
+      },
     });
+    if (!error) clearStoredReferralCode();
     return { error };
   };
 
