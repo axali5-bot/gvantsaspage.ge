@@ -3,9 +3,7 @@ import { useRef } from "react";
 import {
   motion,
   useMotionValue,
-  useReducedMotion,
   useSpring,
-  useTransform,
   type Variants,
 } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -29,21 +27,6 @@ const itemVariants: Variants = {
 
 export const HeroSection = () => {
   const { t } = useTranslation();
-  const showcaseRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = showcaseRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
 
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
@@ -54,7 +37,27 @@ export const HeroSection = () => {
 
   return (
     <section className="relative w-full min-h-screen overflow-hidden flex items-center bg-gradient-to-br from-rose-50 via-white to-pink-100 text-slate-900">
-      <AnimatedBackground />
+      {/* Background video */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/blush-perfume.png"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover"
+        >
+          <source src="/videos/hero-video.mp4" type="video/mp4" />
+        </video>
+
+        {/* Left scrim — keeps the dark headline readable over the footage */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/35 to-transparent" />
+        {/* Bottom fade — blends the video into the page background */}
+        <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-rose-50 via-rose-50/60 to-transparent" />
+        {/* Top fade — softens under the header */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/50 to-transparent" />
+      </div>
+
       <GrainOverlay />
       <CornerFrame />
 
@@ -70,27 +73,27 @@ export const HeroSection = () => {
         </motion.span>
       </div>
 
-      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10 pt-16 pb-16 lg:pt-16 lg:pb-16">
-        {/* LEFT — Typography & CTA */}
+      {/* Content */}
+      <div className="container mx-auto px-6 relative z-10 pt-24 pb-24">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="order-2 lg:order-1 flex flex-col justify-center items-center text-center lg:items-start lg:text-left space-y-6 lg:space-y-8 lg:pr-8"
+          className="max-w-2xl flex flex-col justify-center items-center text-center lg:items-start lg:text-left space-y-6 lg:space-y-8"
         >
           <motion.div variants={itemVariants} className="mx-auto lg:mx-0 w-max">
             <CollectionBadge />
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex items-center gap-3 text-slate-400">
+          <motion.div variants={itemVariants} className="flex items-center gap-3 text-slate-500">
             <span className="font-sans text-[11px] tracking-[0.3em]">01</span>
-            <span className="h-px w-8 bg-slate-300" />
+            <span className="h-px w-8 bg-slate-400" />
             <span className="font-sans text-[10px] uppercase tracking-[0.35em]">
               The Art of Glow
             </span>
           </motion.div>
 
-          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-light leading-[0.95] sm:leading-[0.92] tracking-tight text-slate-900">
+          <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-light leading-[0.95] sm:leading-[0.92] tracking-tight text-slate-900 drop-shadow-sm">
             <motion.span variants={itemVariants} className="block">AURA.</motion.span>
             <motion.span variants={itemVariants} className="block text-[#D4AF37] italic">FLAME.</motion.span>
             <motion.span variants={itemVariants} className="block">GLOW.</motion.span>
@@ -98,7 +101,7 @@ export const HeroSection = () => {
 
           <motion.p
             variants={itemVariants}
-            className="font-sans text-slate-600 max-w-md text-sm sm:text-base md:text-lg font-light leading-relaxed tracking-wide text-balance"
+            className="font-sans text-slate-700 max-w-md text-sm sm:text-base md:text-lg font-light leading-relaxed tracking-wide text-balance"
           >
             {t("hero.description")}
           </motion.p>
@@ -118,69 +121,6 @@ export const HeroSection = () => {
             <Stat value={t("hero.stat3_value")} label={t("hero.stat3_label")} />
           </motion.div>
         </motion.div>
-
-        {/* RIGHT — Asymmetrical floating showcase (Staircase diagonal) */}
-        <div
-          ref={showcaseRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          className="order-1 lg:order-2 relative h-[48vh] sm:h-[55vh] lg:h-[80vh] w-full flex items-center justify-center -ml-4 lg:-ml-0"
-        >
-          {/* Main — Perfume (center) */}
-          <ParallaxImage
-            src="/images/blush-perfume.png"
-            alt="Signature Eau de Parfum"
-            caption="Signature Eau de Parfum"
-            mouseX={mouseX}
-            mouseY={mouseY}
-            depth={22}
-            className="absolute z-20 w-[44%] aspect-[4/5] left-1/2 top-1/2 ml-[-22%] mt-[-27.5%]"
-            floatDuration={6}
-            floatOffset={20}
-            delay={0.4}
-          />
-          {/* Jewelry — top-right higher step */}
-          <ParallaxImage
-            src="/images/blush-jewelry.png"
-            alt="Fine Jewelry"
-            caption="Fine Jewelry"
-            mouseX={mouseX}
-            mouseY={mouseY}
-            depth={42}
-            className="absolute z-30 w-[34%] aspect-[4/5] left-1/2 top-1/2 ml-[14%] mt-[-46%]"
-            floatDuration={7.5}
-            floatOffset={28}
-            delay={0.6}
-          />
-          {/* Skincare — bottom-left lower step */}
-          <ParallaxImage
-            src="/images/blush-skincare.png"
-            alt="Radiance Serum"
-            caption="Radiance Serum"
-            mouseX={mouseX}
-            mouseY={mouseY}
-            depth={14}
-            className="absolute z-10 w-[32%] aspect-[4/5] left-1/2 top-1/2 ml-[-46%] mt-[8%]"
-            floatDuration={9}
-            floatOffset={16}
-            delay={0.8}
-          />
-
-          {/* Decorative gold rings */}
-          <motion.div
-            aria-hidden
-            initial={{ opacity: 0, scale: 0.8, rotate: -20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }}
-            className="absolute inset-0 m-auto h-[72%] w-[72%] rounded-full border border-[#D4AF37]/20"
-          />
-          <motion.div
-            aria-hidden
-            animate={{ rotate: 360 }}
-            transition={{ duration: 60, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            className="absolute inset-0 m-auto h-[88%] w-[88%] rounded-full border border-dashed border-[#D4AF37]/15"
-          />
-        </div>
       </div>
 
       {/* Scroll hint */}
@@ -284,7 +224,7 @@ function MagneticButton({ label, onClick }: { label: string; onClick: () => void
       onClick={onClick}
       style={{ x: springX, y: springY }}
       whileTap={{ scale: 0.97 }}
-      className="group relative flex items-center gap-3 w-max px-9 py-4 overflow-hidden border border-[#D4AF37]/40 bg-white/40 backdrop-blur-md shadow-[0_8px_30px_-12px_rgba(212,175,55,0.4)]"
+      className="group relative flex items-center gap-3 w-max px-9 py-4 overflow-hidden border border-[#D4AF37]/40 bg-white/50 backdrop-blur-md shadow-[0_8px_30px_-12px_rgba(212,175,55,0.4)]"
     >
       <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/30 to-[#D4AF37]/0 transition-transform duration-700 ease-out group-hover:translate-x-full" />
       <span className="pointer-events-none absolute inset-0 bg-[#D4AF37] opacity-0 transition-opacity duration-500 group-hover:opacity-[0.12]" />
@@ -293,57 +233,6 @@ function MagneticButton({ label, onClick }: { label: string; onClick: () => void
       </span>
       <ArrowRight className="relative z-10 w-4 h-4 text-[#D4AF37] transition-transform duration-500 group-hover:translate-x-1.5" />
     </motion.button>
-  );
-}
-
-function ParallaxImage({
-  src, alt, caption, mouseX, mouseY, depth, className, floatDuration, floatOffset, delay,
-}: {
-  src: string;
-  alt: string;
-  caption: string;
-  mouseX: ReturnType<typeof useMotionValue<number>>;
-  mouseY: ReturnType<typeof useMotionValue<number>>;
-  depth: number;
-  className?: string;
-  floatDuration: number;
-  floatOffset: number;
-  delay: number;
-}) {
-  const reduced = useReducedMotion();
-  const px = useTransform(mouseX, [-0.5, 0.5], [-depth, depth]);
-  const py = useTransform(mouseY, [-0.5, 0.5], [-depth, depth]);
-  const springX = useSpring(px, { stiffness: 80, damping: 25 });
-  const springY = useSpring(py, { stiffness: 80, damping: 25 });
-  const safeOffset = reduced ? 0 : floatOffset / 2;
-
-  return (
-    <motion.div
-      style={{ x: springX, y: springY }}
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay }}
-      className={className}
-    >
-      <motion.div
-        animate={{ y: [-safeOffset, safeOffset, -safeOffset] }}
-        transition={{ duration: floatDuration + 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="group relative h-full w-full"
-      >
-        <div className="relative h-full w-full overflow-hidden rounded-sm border border-white/60 shadow-[0_30px_70px_-25px_rgba(190,120,130,0.55)]">
-          <img
-            src={src}
-            alt={alt}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent" />
-          <div className="absolute inset-0 ring-1 ring-inset ring-[#D4AF37]/25" />
-        </div>
-        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#D4AF37]/30 bg-white/80 px-3 py-1 backdrop-blur-md shadow-sm opacity-0 translate-y-1 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
-          <span className="font-sans text-[8px] uppercase tracking-[0.25em] text-slate-700">{caption}</span>
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }
 
@@ -388,23 +277,5 @@ function GrainOverlay() {
           "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
       }}
     />
-  );
-}
-
-function AnimatedBackground() {
-  return (
-    <div aria-hidden className="absolute inset-0 z-0">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_30%,rgba(212,175,55,0.10),transparent_55%)]" />
-      <div
-        className="absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(115deg, transparent 0px, transparent 38px, rgba(212,175,55,0.7) 39px, transparent 40px)",
-        }}
-      />
-      {/* Static blobs — no animation on blur elements (animated blur-3xl kills GPU) */}
-      <div className="absolute -top-1/4 left-1/4 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,rgba(244,194,194,0.4),transparent_60%)] blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 h-[50vh] w-[50vh] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.08),transparent_60%)] blur-3xl" />
-    </div>
   );
 }
