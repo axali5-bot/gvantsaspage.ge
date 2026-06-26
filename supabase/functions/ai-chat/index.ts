@@ -12,6 +12,8 @@ const ANON_KEY     = Deno.env.get("SUPABASE_ANON_KEY")!;
 const GEMINI_KEY   = Deno.env.get("GEMINI_API_KEY")?.trim();
 const MODEL        = "gemini-2.5-flash";
 
+const sb = createClient(SUPABASE_URL, ANON_KEY);
+
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -41,7 +43,6 @@ const BASE_INSTRUCTION = `შენ ხარ "Avon2Flame"-ის პრემ�
 /** Build the live product catalog for the system prompt (server-side, anon read). */
 async function buildCatalog(): Promise<string> {
   try {
-    const sb = createClient(SUPABASE_URL, ANON_KEY);
     const { data } = await sb
       .from("products")
       .select("id, name_ka, name_en, price, gender, stock_quantity, description_ka")
@@ -71,6 +72,20 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
   if (!GEMINI_KEY) return json({ error: "GEMINI_API_KEY not set" }, 503);
+
+  // Rate limit by client IP (abuse / Gemini-quota protection). Fail-open:
+  // if the limiter itself errors, let the chat through rather than break it.
+  const ip = req.headers.get("cf-connecting-ip")
+    ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    ?? "unknown";
+  const { data: allowed, error: rlErr } = await sb.rpc("check_rate_limit", {
+    p_key: `ai-chat:${ip}`,
+    p_max: 20,
+    p_window_seconds: 60,
+  });
+  if (!rlErr && allowed === false) {
+    return json({ error: "ძალიან ბევრი შეტყობინება — გთხოვ, სცადე ცოტა ხანში 🙏" }, 429);
+  }
 
   let body: { message?: string; history?: HistoryItem[] };
   try {
