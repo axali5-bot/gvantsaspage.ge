@@ -50,7 +50,7 @@ const AdminAnalytics = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64 text-sm text-muted-foreground uppercase tracking-widest">
+      <div className="flex items-center justify-center h-64 text-sm text-stone-400 uppercase tracking-widest">
         Loading analytics...
       </div>
     );
@@ -62,7 +62,7 @@ const AdminAnalytics = () => {
         <p className="text-sm text-destructive">Failed to load analytics data</p>
         <button
           onClick={() => refetch()}
-          className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground border border-border px-4 py-2 rounded-sm transition-colors"
+          className="text-xs font-semibold text-stone-500 hover:text-stone-800 border border-stone-200 px-4 py-2 rounded-xl transition-colors"
         >
           Try again
         </button>
@@ -73,18 +73,18 @@ const AdminAnalytics = () => {
   const noOrders = filteredCount === 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* ── Operational Alerts (always visible, above time-range filter) ── */}
       <div className="space-y-2">
         {/* Pending orders banner */}
         {pendingCount > 0 && (
           <button
             onClick={() => navigate('/admin/orders')}
-            className="w-full flex items-center justify-between gap-3 bg-rose-50 border border-rose-200 rounded-sm px-4 py-3 text-left hover:bg-rose-100 transition-colors group"
+            className="w-full flex items-center justify-between gap-3 admin-alert-rose text-left hover:opacity-90 transition-opacity group"
           >
             <div className="flex items-center gap-3">
               <Bell size={15} className="text-rose-500 shrink-0" />
-              <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-rose-700">
                 {pendingCount} შეკვეთა ელოდება დამუშავებას
               </span>
             </div>
@@ -98,16 +98,16 @@ const AdminAnalytics = () => {
 
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="font-display text-xl">
+        <h2 className="font-display text-xl text-stone-800">
           Analytics
-          <span className="ml-2 text-sm font-body text-muted-foreground font-normal">
+          <span className="ml-2 text-sm font-body text-stone-400 font-normal">
             ({filteredCount} orders)
           </span>
         </h2>
         <TimeRangePills value={range} onChange={setRange} />
       </div>
 
-      {/* ── Visitors (independent of orders — always visible) ── */}
+      {/* ── Visitors ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="grid grid-cols-3 lg:grid-cols-1 gap-4 lg:col-span-1">
           <KPICard
@@ -115,24 +115,25 @@ const AdminAnalytics = () => {
             value={String(visitors.uniqueVisitors)}
             icon={Users}
             hint={hint}
+            iconVariant="violet"
           />
           <KPICard
             label="ვიზიტი"
             value={String(visitors.totalVisits)}
             icon={Eye}
             hint={hint}
+            iconVariant="blue"
           />
           <KPICard
             label="დღეს"
             value={String(visitors.todayVisitors)}
             icon={CalendarDays}
             hint="უნიკალური ვიზიტორი"
+            iconVariant="stone"
           />
         </div>
-        <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
-          <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-            ვიზიტორები დღეების მიხედვით
-          </h3>
+        <div className="lg:col-span-2 admin-card p-6">
+          <h3 className="admin-section-title">ვიზიტორები დღეების მიხედვით</h3>
           <VisitorsChart
             data={visitors.visitorsPerDay}
             empty={visitors.totalVisits === 0}
@@ -141,9 +142,9 @@ const AdminAnalytics = () => {
       </div>
 
       {noOrders ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center border border-border rounded-sm">
-          <p className="text-sm text-muted-foreground">No orders in this range</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">Try a wider time range</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center admin-card">
+          <p className="text-sm text-stone-500">No orders in this range</p>
+          <p className="text-xs text-stone-400 mt-1">Try a wider time range</p>
         </div>
       ) : (
         <>
@@ -155,18 +156,21 @@ const AdminAnalytics = () => {
               icon={Banknote}
               hint={RANGE_VS[range] || hint}
               trend={revenueChange}
+              iconVariant="green"
             />
             <KPICard
               label="Orders"
               value={String(kpis.orderCount)}
               icon={ShoppingBag}
               hint={hint}
+              iconVariant="blue"
             />
             <KPICard
               label="Avg Order Value"
               value={`₾${kpis.avgOrderValue.toFixed(2)}`}
               icon={TrendingUp}
               hint={hint}
+              iconVariant="rose"
             />
             <KPICard
               label="Top Product"
@@ -179,42 +183,37 @@ const AdminAnalytics = () => {
               }
               icon={Star}
               hint={hint}
+              iconVariant="gold"
             />
           </div>
 
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
-              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                Revenue
-              </h3>
+            <div className="lg:col-span-2 admin-card p-6">
+              <h3 className="admin-section-title">Revenue</h3>
               <RevenueChart data={ordersPerDay} empty={ordersPerDay.length === 0} />
             </div>
-            <div className="border border-border rounded-sm p-5 bg-background">
-              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                Order Status
-              </h3>
+            <div className="admin-card p-6">
+              <h3 className="admin-section-title">Order Status</h3>
               <StatusBreakdown buckets={statusBreakdown} />
             </div>
           </div>
 
           {/* Top Products */}
-          <div className="border border-border rounded-sm p-5 bg-background">
-            <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-              Top Products by Revenue
-            </h3>
+          <div className="admin-card p-6">
+            <h3 className="admin-section-title">Top Products by Revenue</h3>
             <TopProductsList products={topProducts} />
           </div>
 
-          {/* ── Profitability (მოგება) ── */}
-          <div className="flex items-center gap-3 pt-4">
-            <h2 className="font-display text-xl">მოგება</h2>
-            <span className="h-px flex-1 bg-border" />
+          {/* ── Profitability ── */}
+          <div className="flex items-center gap-3 pt-2">
+            <h2 className="font-display text-xl text-stone-800">მოგება</h2>
+            <span className="h-px flex-1 bg-stone-200" />
           </div>
 
-          {/* Trust banner: profit is only as good as the cost data behind it */}
+          {/* Coverage warning */}
           {profit.coveragePct < 100 && (
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-sm px-4 py-3">
+            <div className="flex items-start gap-3 admin-alert-amber">
               <AlertTriangle size={15} className="text-amber-500 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-800 leading-relaxed">
                 თვითღირებულება ცნობილია გაყიდული ერთეულების{' '}
@@ -232,45 +231,46 @@ const AdminAnalytics = () => {
               value={`₾${profit.cogs.toFixed(2)}`}
               icon={Wallet}
               hint={hint}
+              iconVariant="stone"
             />
             <KPICard
               label="მთლიანი მოგება"
               value={`₾${profit.grossProfit.toFixed(2)}`}
               icon={PiggyBank}
               hint={`მარჟა ${profit.marginPct.toFixed(1)}%`}
+              iconVariant="green"
             />
             <KPICard
               label="სხვა ხარჯები"
               value={`₾${profit.expensesTotal.toFixed(2)}`}
               icon={Receipt}
               hint={hint}
+              iconVariant="rose"
             />
             <KPICard
               label="სუფთა მოგება"
               value={`₾${profit.netProfit.toFixed(2)}`}
               icon={Percent}
               hint="მოგება − ხარჯები"
+              iconVariant="gold"
             />
             <KPICard
               label="საწყობის ღირებულება"
               value={`₾${profit.inventoryValue.toFixed(2)}`}
               icon={Boxes}
               hint="მარაგი × თვითღირებულება"
+              iconVariant="blue"
             />
           </div>
 
           {/* Profit chart + top-by-profit */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
-              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                შემოსავალი vs მოგება
-              </h3>
+            <div className="lg:col-span-2 admin-card p-6">
+              <h3 className="admin-section-title">შემოსავალი vs მოგება</h3>
               <ProfitChart data={profit.profitPerDay} empty={profit.profitPerDay.length === 0} />
             </div>
-            <div className="border border-border rounded-sm p-5 bg-background">
-              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                ტოპ პროდუქტები მოგებით
-              </h3>
+            <div className="admin-card p-6">
+              <h3 className="admin-section-title">ტოპ პროდუქტები მოგებით</h3>
               <TopProfitList products={profit.topByProfit} />
             </div>
           </div>

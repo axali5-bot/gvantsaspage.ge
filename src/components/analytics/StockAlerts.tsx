@@ -21,12 +21,12 @@ export const StockAlerts = () => {
       {outOfStock.length > 0 && (
         <button
           onClick={() => navigate('/admin/products')}
-          className="w-full flex items-center justify-between gap-3 bg-red-50 border border-red-200 rounded-sm px-4 py-3 text-left hover:bg-red-100 transition-colors group"
+          className="w-full flex items-center justify-between gap-3 admin-alert-red text-left hover:opacity-90 transition-opacity group"
         >
           <div className="flex items-center gap-3">
             <Package size={15} className="text-red-500 shrink-0" />
             <div>
-              <span className="text-xs font-semibold text-red-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-red-700">
                 {outOfStock.length} პროდუქტი ამოწურულია
               </span>
               <p className="text-[11px] text-red-500 mt-0.5 truncate max-w-sm">
@@ -41,12 +41,12 @@ export const StockAlerts = () => {
       {lowStock.length > 0 && (
         <button
           onClick={() => navigate('/admin/products')}
-          className="w-full flex items-center justify-between gap-3 bg-amber-50 border border-amber-200 rounded-sm px-4 py-3 text-left hover:bg-amber-100 transition-colors group"
+          className="w-full flex items-center justify-between gap-3 admin-alert-amber text-left hover:opacity-90 transition-opacity group"
         >
           <div className="flex items-center gap-3">
             <AlertTriangle size={15} className="text-amber-500 shrink-0" />
             <div>
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-amber-700">
                 {lowStock.length} პროდუქტს მცირე მარაგი აქვს (≤{LOW_THRESHOLD})
               </span>
               <p className="text-[11px] text-amber-600 mt-0.5 truncate max-w-sm">
