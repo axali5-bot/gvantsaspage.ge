@@ -4,7 +4,7 @@ import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight } from 'luc
 import { useAnalytics, TimeRange } from '@/hooks/useAnalytics';
 import { KPICard } from '@/components/analytics/KPICard';
 import { TimeRangePills } from '@/components/analytics/TimeRangePills';
-import { OrdersBarChart } from '@/components/analytics/OrdersBarChart';
+import { RevenueChart } from '@/components/analytics/RevenueChart';
 import { StatusBreakdown } from '@/components/analytics/StatusBreakdown';
 import { TopProductsList } from '@/components/analytics/TopProductsList';
 import { StockAlerts } from '@/components/analytics/StockAlerts';
@@ -146,9 +146,9 @@ const AdminAnalytics = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
               <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
-                Orders & Revenue
+                Revenue
               </h3>
-              <OrdersBarChart data={ordersPerDay} empty={ordersPerDay.length === 0} />
+              <RevenueChart data={ordersPerDay} empty={ordersPerDay.length === 0} />
             </div>
             <div className="border border-border rounded-sm p-5 bg-background">
               <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
