@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { Product } from '@/hooks/useProducts';
+import { Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
+import { Product, useUpdateProduct } from '@/hooks/useProducts';
 import { SyncMap } from '@/hooks/useSamkaulebiSync';
 
 const PAGE_SIZE = 20;
@@ -48,6 +49,17 @@ function MarginCell({ price, cost }: { price: number; cost?: number }) {
 
 export const ProductTable = ({ products, onEdit, onDelete, selected, onSelectionChange, syncMap, costMap }: Props) => {
   const [search, setSearch] = useState('');
+  const updateProduct = useUpdateProduct();
+
+  const togglePublish = async (p: Product) => {
+    const next = p.is_published === false;
+    try {
+      await updateProduct.mutateAsync({ id: p.id, patch: { is_published: next } });
+      toast.success(next ? `✓ „${p.name_ka}" გამოქვეყნდა საიტზე` : `„${p.name_ka}" დაიმალა საიტიდან`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'ვერ შეიცვალა');
+    }
+  };
   const [sortField, setSortField] = useState<SortField>('name_ka');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
@@ -164,7 +176,16 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                       <div className="w-10 h-10 bg-stone-100 rounded-lg" />
                     )}
                   </TableCell>
-                  <TableCell className="font-body font-medium text-stone-800 py-3">{product.name_ka}</TableCell>
+                  <TableCell className="font-body font-medium text-stone-800 py-3">
+                    <div className="flex items-center gap-2">
+                      <span>{product.name_ka}</span>
+                      {product.is_published === false && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-500 shrink-0">
+                          <EyeOff size={10} /> დამალული
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="font-body text-stone-700 py-3 tabular-nums">{product.price} ₾</TableCell>
                   <TableCell className="py-3">
                     <MarginCell price={product.price} cost={costMap?.get(product.id)} />
@@ -181,6 +202,17 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                   )}
                   <TableCell className="text-right py-3">
                     <div className="flex justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => togglePublish(product)}
+                        className="h-8 w-8 rounded-lg hover:bg-stone-100"
+                        title={product.is_published === false ? 'გამოქვეყნება საიტზე' : 'დამალვა საიტიდან'}
+                      >
+                        {product.is_published === false
+                          ? <EyeOff size={14} className="text-amber-500" />
+                          : <Eye size={14} className="text-stone-400" />}
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => onEdit(product)} className="h-8 w-8 rounded-lg hover:bg-stone-100">
                         <Pencil size={14} className="text-stone-500" />
                       </Button>

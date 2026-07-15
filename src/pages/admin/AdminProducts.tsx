@@ -37,8 +37,11 @@ export const AdminProducts = () => {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkSync, setBulkSync] = useState<BulkSyncState | null>(null);
 
-  // Products that still need pushing: never synced, or changed since (dirty/error)
-  const unsyncedProducts = products.filter((p) => syncMap.get(p.id)?.status !== 'synced');
+  // Products that still need pushing: never synced, or changed since (dirty/error).
+  // Hidden drafts are excluded — don't ship unfinished products to the partner shop.
+  const unsyncedProducts = products.filter(
+    (p) => p.is_published !== false && syncMap.get(p.id)?.status !== 'synced',
+  );
 
   const handleBulkSync = async () => {
     const toSync = unsyncedProducts;

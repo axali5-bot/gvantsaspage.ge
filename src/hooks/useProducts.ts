@@ -15,6 +15,8 @@ export interface Product {
   stock_quantity: number | null;
   created_at: string;
   gender: string | null;
+  /** false = hidden draft (quick-created from a purchase; not visible on the storefront) */
+  is_published: boolean;
   /** Derived: best-available name for current UI language. */
   name: string;
   /** Derived: best-available description for current UI language. */
@@ -33,6 +35,7 @@ export interface ProductInput {
   category_id: string | null;
   stock_quantity: number;
   gender?: string;
+  is_published?: boolean;
 }
 
 const PRODUCTS_KEY = ['products'] as const;

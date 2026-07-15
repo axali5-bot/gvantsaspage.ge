@@ -41,8 +41,15 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
 
-  const { data: products = [], isLoading: loading, error } = useProducts();
+  const { data: allProducts = [], isLoading: loading, error } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+
+  // RLS already hides unpublished drafts from the public; this extra filter
+  // covers an admin browsing the storefront (their session sees everything).
+  const products = useMemo(
+    () => allProducts.filter((p) => p.is_published !== false),
+    [allProducts],
+  );
 
   // Interleave across top-level categories so the grid opens with variety.
   const orderedProducts = useMemo(
