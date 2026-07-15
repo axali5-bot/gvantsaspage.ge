@@ -46,15 +46,15 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
 
         const userMsg = input.trim();
         setInput("");
-        setMessages((prev) => [...prev, { id: Date.now().toString(), text: userMsg, sender: "user" }]);
-        
+        setMessages((prev) => [...prev, { id: crypto.randomUUID(), text: userMsg, sender: "user" }]);
+
         setIsLoading(true);
         onLoadingChange?.(true);
         try {
             const aiResponse = await sendMessageToGemini(userMsg);
-            setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), text: aiResponse, sender: "bot" }]);
+            setMessages((prev) => [...prev, { id: crypto.randomUUID(), text: aiResponse, sender: "bot" }]);
         } catch (error) {
-            setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), text: "უკაცრავად, კავშირის შეცდომაა. გთხოვთ სცადოთ მოგვიანებით. 🌹", sender: "bot" }]);
+            setMessages((prev) => [...prev, { id: crypto.randomUUID(), text: "უკაცრავად, კავშირის შეცდომაა. გთხოვთ სცადოთ მოგვიანებით. 🌹", sender: "bot" }]);
         } finally {
             setIsLoading(false);
             onLoadingChange?.(false);
@@ -85,8 +85,9 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
                                 </p>
                             </div>
                         </div>
-                        <button 
+                        <button
                             onClick={onClose}
+                            aria-label="დახურვა"
                             className="text-gray-400 hover:text-gray-700 hover:bg-white/50 rounded-full transition-all p-1.5"
                         >
                             <X size={20} />
@@ -102,11 +103,10 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
                                 key={msg.id}
                                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                             >
-                                <div className={`max-w-[90%] rounded-[1.2rem] p-3.5 text-[0.9rem] leading-relaxed shadow-sm ${
-                                    msg.sender === "user"
-                                    ? "bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-tr-[4px]"
-                                    : "bg-white border border-rose-100/50 text-[#374151] rounded-tl-[4px]"
-                                }`}>
+                                <div className={`max-w-[90%] rounded-[1.2rem] p-3.5 text-[0.9rem] leading-relaxed shadow-sm ${msg.sender === "user"
+                                        ? "bg-gradient-to-br from-pink-600 to-rose-500 text-white rounded-tr-[4px]"
+                                        : "bg-white border border-rose-100/50 text-[#374151] rounded-tl-[4px]"
+                                    }`}>
                                     {msg.sender === "bot" ? (
                                         <div className="prose prose-sm prose-p:leading-relaxed prose-ul:my-1 prose-li:my-0.5 prose-strong:text-pink-600 prose-a:text-pink-500 max-w-none break-words">
                                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -148,6 +148,7 @@ const CustomChatWindow = ({ isOpen, onClose, onLoadingChange }: CustomChatWindow
                             <button
                                 onClick={handleSend}
                                 disabled={!input.trim() || isLoading}
+                                aria-label="გაგზავნა"
                                 className="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-rose-500 text-white flex items-center justify-center disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 disabled:shadow-none hover:shadow-md hover:-translate-y-0.5 transition-all"
                             >
                                 <Send size={18} className="-ml-0.5" />
