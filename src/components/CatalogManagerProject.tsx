@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
+import { optimizeImage } from '@/lib/imageOptimizer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -103,7 +104,9 @@ const CatalogManagerProject = () => {
       );
       let successCount = 0;
       for (let i = 0; i < sorted.length; i++) {
-        const file = sorted[i];
+        // Catalog scans are read fullscreen — keep more resolution (2000px) so
+        // small print stays legible, but still convert to WebP for weight.
+        const { file } = await optimizeImage(sorted[i], { maxDim: 2000, quality: 0.85 });
         const fileName = `${brand}/page-${i + 1}-${Date.now()}.${file.name.split('.').pop()}`;
         const { error: upErr } = await supabase.storage.from('catalogs').upload(fileName, file, { upsert: true });
         if (upErr) continue;

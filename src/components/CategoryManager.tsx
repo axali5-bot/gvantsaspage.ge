@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Plus, Pencil, Trash2, FolderOpen, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import { optimizeImage, formatSavings } from '@/lib/imageOptimizer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,9 +35,15 @@ import { toast } from 'sonner';
 
 // Same public bucket the product images use (admin-only insert policy covers it).
 async function uploadCategoryImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop();
+  // Shrink to web size (≤1600px, WebP) before upload; original kept on failure.
+  const result = await optimizeImage(file);
+  const upload = result.file;
+  if (!result.skipped && result.optimizedBytes < result.originalBytes * 0.8) {
+    toast.info(`📸 ფოტო შეიკუმშა: ${formatSavings(result)}`);
+  }
+  const ext = upload.name.split('.').pop();
   const fileName = `category-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-  const { error } = await supabase.storage.from('products').upload(fileName, file);
+  const { error } = await supabase.storage.from('products').upload(fileName, upload);
   if (error) throw new Error(`Upload failed: ${error.message}`);
   const { data } = supabase.storage.from('products').getPublicUrl(fileName);
   return data.publicUrl;

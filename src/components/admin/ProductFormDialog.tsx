@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Upload, X, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
+import { optimizeImage, formatSavings } from '@/lib/imageOptimizer';
 import { useCreateProduct, useUpdateProduct, Product, ProductInput } from '@/hooks/useProducts';
 import { useProductCosts, useUpsertProductCost } from '@/hooks/useProductCosts';
 import { syncProduct } from '@/lib/samkaulebiSync';
@@ -46,9 +47,16 @@ interface Props {
 }
 
 async function uploadProductImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop();
+  // Shrink to web size (≤1600px, WebP) before upload; falls back to the
+  // original file if the browser can't optimize it.
+  const result = await optimizeImage(file);
+  const upload = result.file;
+  if (!result.skipped && result.optimizedBytes < result.originalBytes * 0.8) {
+    toast.info(`📸 ფოტო შეიკუმშა: ${formatSavings(result)}`);
+  }
+  const ext = upload.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-  const { error } = await supabase.storage.from('products').upload(fileName, file);
+  const { error } = await supabase.storage.from('products').upload(fileName, upload);
   if (error) throw new Error(`Upload failed: ${error.message}`);
   const { data } = supabase.storage.from('products').getPublicUrl(fileName);
   return data.publicUrl;
