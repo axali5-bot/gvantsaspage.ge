@@ -2,11 +2,38 @@ import { useState, useMemo } from 'react';
 import { Header } from '@/components/Header';
 import { HeroSection } from '@/components/HeroSection';
 import { ProductGrid } from '@/components/ProductGrid';
+import { CategoryShowcase, CategoryTile } from '@/components/CategoryShowcase';
 import SEO from '@/components/SEO';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useCategories, Category } from '@/hooks/useCategories';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+
+/** Resolve a product's category_id to its top-level (parent) category id. */
+function topCategoryId(catId: string | null, categories: Category[]): string | null {
+  if (!catId) return null;
+  const c = categories.find((x) => x.id === catId);
+  return c?.parent_id ?? c?.id ?? null;
+}
+
+/** Round-robin interleave products across their top-level category, so the grid
+ *  opens with a mix (perfume + jewelry + skincare) instead of whichever category
+ *  was added last. Order within each category is preserved (newest first). */
+function interleaveByCategory(products: Product[], categories: Category[]): Product[] {
+  const groups = new Map<string, Product[]>();
+  for (const p of products) {
+    const key = topCategoryId(p.category_id, categories) ?? 'uncategorized';
+    const list = groups.get(key) ?? [];
+    list.push(p);
+    groups.set(key, list);
+  }
+  const lists = [...groups.values()];
+  const out: Product[] = [];
+  for (let i = 0; lists.some((l) => i < l.length); i++) {
+    for (const l of lists) if (i < l.length) out.push(l[i]);
+  }
+  return out;
+}
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,8 +44,14 @@ const Index = () => {
   const { data: products = [], isLoading: loading, error } = useProducts();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
+  // Interleave across top-level categories so the grid opens with variety.
+  const orderedProducts = useMemo(
+    () => interleaveByCategory(products, categories),
+    [products, categories],
+  );
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return orderedProducts.filter((product) => {
       const name = product.name ?? '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -37,12 +70,26 @@ const Index = () => {
 
       return matchesSearch && matchesGender && matchesCategory && matchesSubcategory;
     });
-  }, [searchQuery, selectedGender, selectedCategory, selectedSubcategory, products, categories]);
+  }, [searchQuery, selectedGender, selectedCategory, selectedSubcategory, orderedProducts, categories]);
 
   const parentCategories = useMemo(() => categories.filter(c => !c.parent_id), [categories]);
   const subcategories = useMemo(() =>
     selectedCategory ? categories.filter(c => c.parent_id === selectedCategory) : []
     , [categories, selectedCategory]);
+
+  // Photo tiles for the "Shop by Category" showcase — each borrows the newest
+  // product image in that top-level category (no extra assets needed).
+  const categoryTiles = useMemo<CategoryTile[]>(() =>
+    parentCategories.map((cat) => {
+      const rep = products.find(
+        (p) => topCategoryId(p.category_id, categories) === cat.id && p.image_url,
+      );
+      return { id: cat.id, name: cat.name_ka, image: rep?.image_url ?? null };
+    }), [parentCategories, products, categories]);
+
+  const scrollToProducts = () => {
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,6 +99,16 @@ const Index = () => {
       />
       <Header onSearch={setSearchQuery} />
       <HeroSection />
+
+      <CategoryShowcase
+        tiles={categoryTiles}
+        selected={selectedCategory}
+        onSelect={(id) => {
+          setSelectedCategory(id);
+          setSelectedSubcategory(null);
+          scrollToProducts();
+        }}
+      />
 
       <main id="products" className="container max-w-6xl mx-auto px-4 py-8 md:py-12 scroll-mt-32 md:scroll-mt-36">
 
