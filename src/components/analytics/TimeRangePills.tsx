@@ -13,15 +13,15 @@ const RANGES: { value: TimeRange; label: string }[] = [
 ];
 
 export const TimeRangePills = ({ value, onChange }: TimeRangePillsProps) => (
-  <div className="inline-flex p-1 bg-muted rounded-sm gap-0.5">
+  <div className="inline-flex p-1 bg-stone-100 rounded-xl gap-0.5">
     {RANGES.map((r) => (
       <button
         key={r.value}
         onClick={() => onChange(r.value)}
-        className={`px-3 py-1.5 text-xs uppercase tracking-widest font-semibold rounded-sm transition-colors ${
+        className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-all duration-200 ${
           value === r.value
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground hover:text-foreground'
+            ? 'bg-white text-stone-800 shadow-sm'
+            : 'text-stone-500 hover:text-stone-700'
         }`}
       >
         {r.label}
