@@ -22,7 +22,7 @@ function PurchaseItems({ poId }: { poId: string }) {
     return <div className="py-3 px-4 text-sm text-muted-foreground flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> იტვირთება…</div>;
   }
   return (
-    <div className="border-t border-border/60 bg-muted/20">
+    <div className="border-t border-stone-100 bg-stone-50/50">
       <table className="w-full text-sm">
         <thead>
           <tr className="text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -50,10 +50,10 @@ function PurchaseItems({ poId }: { poId: string }) {
 function PurchaseCard({ po }: { po: PurchaseOrder }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-border rounded-lg overflow-hidden bg-background">
+    <div className="admin-card overflow-hidden">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-rose-50/30 transition-colors text-left"
       >
         {open ? <ChevronDown size={16} className="shrink-0 text-muted-foreground" /> : <ChevronRight size={16} className="shrink-0 text-muted-foreground" />}
         <span className="text-sm text-muted-foreground tabular-nums w-24 shrink-0">{po.ordered_at}</span>
@@ -86,7 +86,7 @@ export const AdminPurchases = () => {
         <TabsContent value="purchases" className="space-y-5 mt-5">
           <div className="flex justify-between items-center gap-2 flex-wrap">
             <div>
-              <h2 className="font-display text-xl">შესყიდვები</h2>
+              <h2 className="font-display text-xl text-stone-800">შესყიდვები</h2>
               <p className="text-sm text-muted-foreground mt-0.5">
                 სულ {orders.length} შესყიდვა · ხარჯი <span className="font-medium text-foreground">{fmt(totalSpend)} ₾</span>
               </p>

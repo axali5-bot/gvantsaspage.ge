@@ -24,23 +24,23 @@ interface Props {
 }
 
 function SyncBadge({ status, error }: { status?: string; error?: string | null }) {
-  if (!status) return <span className="text-xs text-muted-foreground">—</span>;
-  if (status === 'synced') return <span className="text-xs text-emerald-600 font-medium">✓ synced</span>;
+  if (!status) return <span className="text-xs text-stone-400">—</span>;
+  if (status === 'synced') return <span className="text-xs text-emerald-600 font-semibold">✓ synced</span>;
   if (status === 'error') return (
-    <span className="text-xs text-destructive font-medium" title={error ?? undefined}>⚠ error</span>
+    <span className="text-xs text-destructive font-semibold" title={error ?? undefined}>⚠ error</span>
   );
-  if (status === 'dirty') return <span className="text-xs text-amber-600 font-medium">↻ dirty</span>;
+  if (status === 'dirty') return <span className="text-xs text-amber-600 font-semibold">↻ dirty</span>;
   return null;
 }
 
 function MarginCell({ price, cost }: { price: number; cost?: number }) {
   if (cost == null || cost <= 0) {
-    return <span className="text-xs text-muted-foreground" title="შესყიდვის ფასი არ არის შეყვანილი">—</span>;
+    return <span className="text-xs text-stone-400" title="შესყიდვის ფასი არ არის შეყვანილი">—</span>;
   }
   const margin = price - cost;
   const pct = price > 0 ? Math.round((margin / price) * 100) : 0;
   return (
-    <span className={`font-medium ${margin >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+    <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${margin >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
       {margin >= 0 ? '+' : ''}{margin.toFixed(0)} ₾ · {pct}%
     </span>
   );
@@ -73,7 +73,6 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paged = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  // checkbox, image, name, price, margin, stock, gender, [sync], actions
   const colCount = 8 + (syncMap ? 1 : 0);
 
   const toggleSort = (field: SortField) => {
@@ -83,8 +82,8 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
   };
 
   const sortIcon = (field: SortField) => {
-    if (sortField !== field) return <ArrowUpDown size={13} className="ml-1 opacity-40" />;
-    return sortDir === 'asc' ? <ArrowUp size={13} className="ml-1" /> : <ArrowDown size={13} className="ml-1" />;
+    if (sortField !== field) return <ArrowUpDown size={12} className="ml-1 opacity-30" />;
+    return sortDir === 'asc' ? <ArrowUp size={12} className="ml-1 text-rose-500" /> : <ArrowDown size={12} className="ml-1 text-rose-500" />;
   };
 
   const allPageSelected = paged.length > 0 && paged.every((p) => selected.has(p.id));
@@ -104,84 +103,89 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
 
   return (
     <div className="space-y-3">
+      {/* Search */}
       <Input
         placeholder="Search products..."
         value={search}
         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-        className="max-w-xs"
+        className="max-w-xs rounded-xl border-stone-200 focus-visible:ring-rose-300 bg-white"
       />
 
-      <div className="border border-border rounded-sm overflow-x-auto">
+      {/* Table */}
+      <div className="admin-table-wrap">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">
+          <TableHeader className="admin-thead">
+            <TableRow className="border-0 hover:bg-transparent">
+              <TableHead className="admin-th w-10">
                 <Checkbox checked={allPageSelected} onCheckedChange={toggleAll} />
               </TableHead>
-              <TableHead className="w-16">Image</TableHead>
-              <TableHead>
-                <button className="flex items-center font-semibold" onClick={() => toggleSort('name_ka')}>
+              <TableHead className="admin-th w-16">Image</TableHead>
+              <TableHead className="admin-th">
+                <button className="flex items-center" onClick={() => toggleSort('name_ka')}>
                   Name {sortIcon('name_ka')}
                 </button>
               </TableHead>
-              <TableHead>
-                <button className="flex items-center font-semibold" onClick={() => toggleSort('price')}>
+              <TableHead className="admin-th">
+                <button className="flex items-center" onClick={() => toggleSort('price')}>
                   Price {sortIcon('price')}
                 </button>
               </TableHead>
-              <TableHead>Margin</TableHead>
-              <TableHead>
-                <button className="flex items-center font-semibold" onClick={() => toggleSort('stock_quantity')}>
+              <TableHead className="admin-th">Margin</TableHead>
+              <TableHead className="admin-th">
+                <button className="flex items-center" onClick={() => toggleSort('stock_quantity')}>
                   Stock {sortIcon('stock_quantity')}
                 </button>
               </TableHead>
-              <TableHead>Gender</TableHead>
-              {syncMap && <TableHead>Sync</TableHead>}
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="admin-th">Gender</TableHead>
+              {syncMap && <TableHead className="admin-th">Sync</TableHead>}
+              <TableHead className="admin-th text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paged.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={colCount} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={colCount} className="text-center py-12 text-stone-400 text-sm">
                   {search ? 'No products match your search.' : 'No products yet.'}
                 </TableCell>
               </TableRow>
             ) : (
-              paged.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
+              paged.map((product, idx) => (
+                <TableRow
+                  key={product.id}
+                  className={`admin-tr-hover border-stone-100 ${idx % 2 === 1 ? 'bg-stone-50/40' : ''}`}
+                >
+                  <TableCell className="py-3">
                     <Checkbox checked={selected.has(product.id)} onCheckedChange={() => toggleOne(product.id)} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-3">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.name_ka} className="w-10 h-10 object-cover rounded" />
+                      <img src={product.image_url} alt={product.name_ka} className="w-10 h-10 object-cover rounded-lg shadow-sm" />
                     ) : (
-                      <div className="w-10 h-10 bg-muted rounded" />
+                      <div className="w-10 h-10 bg-stone-100 rounded-lg" />
                     )}
                   </TableCell>
-                  <TableCell className="font-body font-medium">{product.name_ka}</TableCell>
-                  <TableCell className="font-body">{product.price} ₾</TableCell>
-                  <TableCell className="font-body">
+                  <TableCell className="font-body font-medium text-stone-800 py-3">{product.name_ka}</TableCell>
+                  <TableCell className="font-body text-stone-700 py-3 tabular-nums">{product.price} ₾</TableCell>
+                  <TableCell className="py-3">
                     <MarginCell price={product.price} cost={costMap?.get(product.id)} />
                   </TableCell>
-                  <TableCell className="font-body">{product.stock_quantity ?? 0}</TableCell>
-                  <TableCell className="font-body text-xs text-muted-foreground">{product.gender || '—'}</TableCell>
+                  <TableCell className="font-body text-stone-700 py-3 tabular-nums">{product.stock_quantity ?? 0}</TableCell>
+                  <TableCell className="font-body text-xs text-stone-400 py-3">{product.gender || '—'}</TableCell>
                   {syncMap && (
-                    <TableCell>
+                    <TableCell className="py-3">
                       <SyncBadge
                         status={syncMap.get(product.id)?.status}
                         error={syncMap.get(product.id)?.last_error}
                       />
                     </TableCell>
                   )}
-                  <TableCell className="text-right">
+                  <TableCell className="text-right py-3">
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
-                        <Pencil size={15} />
+                      <Button variant="ghost" size="icon" onClick={() => onEdit(product)} className="h-8 w-8 rounded-lg hover:bg-stone-100">
+                        <Pencil size={14} className="text-stone-500" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => onDelete(product)} className="text-destructive hover:text-destructive">
-                        <Trash2 size={15} />
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(product)} className="h-8 w-8 rounded-lg hover:bg-red-50 text-destructive hover:text-destructive">
+                        <Trash2 size={14} />
                       </Button>
                     </div>
                   </TableCell>
@@ -192,14 +196,31 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
         </Table>
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-stone-500">
           <span>
             Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, sorted.length)} of {sorted.length}
           </span>
           <div className="flex gap-1">
-            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Prev</Button>
-            <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="rounded-lg border-stone-200 text-stone-600 hover:bg-stone-50"
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-lg border-stone-200 text-stone-600 hover:bg-stone-50"
+            >
+              Next
+            </Button>
           </div>
         </div>
       )}

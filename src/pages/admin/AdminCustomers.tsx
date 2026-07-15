@@ -82,33 +82,45 @@ export const AdminCustomers = () => {
 
   return (
     <div className="space-y-5">
-      <h2 className="font-display text-xl">კლიენტები ({customers.length})</h2>
+      <h2 className="font-display text-xl text-stone-800">კლიენტები ({customers.length})</h2>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border border-border rounded-sm p-4 bg-background">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Users size={13} /><span className="text-[10px] uppercase tracking-widest">სულ</span>
+        <div className="admin-card admin-card-hover p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
+              <Users size={14} className="text-violet-500" />
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">სულ</span>
           </div>
-          <p className="font-display text-2xl font-light">{customers.length}</p>
+          <p className="font-display text-2xl font-light text-stone-800">{customers.length}</p>
         </div>
-        <div className="border border-border rounded-sm p-4 bg-background">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Star size={13} /><span className="text-[10px] uppercase tracking-widest">მეორედ მყიდველი</span>
+        <div className="admin-card admin-card-hover p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+              <Star size={14} className="text-amber-500" />
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">მეორედ მყიდველი</span>
           </div>
-          <p className="font-display text-2xl font-light">{repeatCustomers}</p>
+          <p className="font-display text-2xl font-light text-stone-800">{repeatCustomers}</p>
         </div>
-        <div className="border border-border rounded-sm p-4 bg-background">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <TrendingUp size={13} /><span className="text-[10px] uppercase tracking-widest">სულ შემოსავალი</span>
+        <div className="admin-card admin-card-hover p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+              <TrendingUp size={14} className="text-emerald-600" />
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">სულ შემოსავალი</span>
           </div>
-          <p className="font-display text-2xl font-light">₾{totalRevenue.toFixed(0)}</p>
+          <p className="font-display text-2xl font-light text-stone-800">₾{totalRevenue.toFixed(0)}</p>
         </div>
-        <div className="border border-border rounded-sm p-4 bg-background">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <ShoppingBag size={13} /><span className="text-[10px] uppercase tracking-widest">საუკეთესო</span>
+        <div className="admin-card admin-card-hover p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
+              <ShoppingBag size={14} className="text-rose-500" />
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">საუკეთესო</span>
           </div>
-          <p className="font-display text-lg font-light truncate">{topCustomer?.name || '—'}</p>
+          <p className="font-display text-lg font-light truncate text-stone-800">{topCustomer?.name || '—'}</p>
         </div>
       </div>
 
@@ -117,29 +129,29 @@ export const AdminCustomers = () => {
         placeholder="სახელი, ტელეფონი ან მისამართი..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm rounded-xl border-stone-200 focus-visible:ring-rose-300 bg-white"
       />
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm border border-border rounded-sm">
+        <div className="text-center py-16 text-stone-400 text-sm admin-card">
           {search ? 'კლიენტი ვერ მოიძებნა' : 'შეკვეთები ჯერ არ არის'}
         </div>
       ) : (
-        <div className="border border-border rounded-sm overflow-x-auto">
+        <div className="admin-table-wrap overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">კლიენტი</th>
-                <th className="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-muted-foreground font-medium hidden sm:table-cell">კონტაქტი</th>
-                <th className="text-center px-4 py-3 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">შეკვეთები</th>
-                <th className="text-right px-4 py-3 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">ჯამი</th>
-                <th className="text-right px-4 py-3 text-[10px] uppercase tracking-widest text-muted-foreground font-medium hidden md:table-cell">ბოლო შეკვეთა</th>
+            <thead className="admin-thead">
+              <tr>
+                <th className="admin-th text-left">კლიენტი</th>
+                <th className="admin-th text-left hidden sm:table-cell">კონტაქტი</th>
+                <th className="admin-th text-center">შეკვეთები</th>
+                <th className="admin-th text-right">ჯამი</th>
+                <th className="admin-th text-right hidden md:table-cell">ბოლო შეკვეთა</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((c, i) => (
-                <tr key={c.key} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
+                <tr key={c.key} className={`border-b border-stone-100 last:border-0 admin-tr-hover ${i % 2 === 1 ? 'bg-stone-50/40' : ''}`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {/* Avatar initials */}

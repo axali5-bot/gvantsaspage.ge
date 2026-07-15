@@ -298,7 +298,7 @@ const CategoryManager = () => {
   );
 
   return (
-    <div className="bg-card border border-border rounded-sm">
+    <div className="admin-table-wrap">
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FolderOpen size={18} className="text-muted-foreground" />
@@ -385,13 +385,13 @@ const CategoryManager = () => {
         </div>
       ) : (
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-body w-14">Photo</TableHead>
-              <TableHead className="font-body">Name (KA)</TableHead>
-              <TableHead className="font-body">Parent</TableHead>
-              <TableHead className="font-body">Slug</TableHead>
-              <TableHead className="font-body text-right">Actions</TableHead>
+          <TableHeader className="admin-thead">
+            <TableRow className="border-0 hover:bg-transparent">
+              <TableHead className="admin-th w-14">Photo</TableHead>
+              <TableHead className="admin-th">Name (KA)</TableHead>
+              <TableHead className="admin-th">Parent</TableHead>
+              <TableHead className="admin-th">Slug</TableHead>
+              <TableHead className="admin-th text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -409,7 +409,7 @@ const CategoryManager = () => {
               .map((category) => {
                 const parent = category.parent_id ? categories.find(c => c.id === category.parent_id) : null;
                 return (
-                  <TableRow key={category.id}>
+                  <TableRow key={category.id} className="border-stone-100 admin-tr-hover">
                     <TableCell>
                       {category.image_url ? (
                         <img src={category.image_url} alt={category.name_ka} className="w-9 h-9 object-cover rounded" />

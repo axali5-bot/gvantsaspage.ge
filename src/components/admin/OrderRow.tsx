@@ -9,9 +9,11 @@ import { useUpdateOrderStatus, Order } from '@/hooks/useOrders';
 
 interface Props {
   order: Order;
+  /** Extra row classes (e.g. zebra tint from the parent table). */
+  className?: string;
 }
 
-export const OrderRow = ({ order }: Props) => {
+export const OrderRow = ({ order, className = '' }: Props) => {
   const updateStatus = useUpdateOrderStatus();
   const [rowStatus, setRowStatus] = useState<Order['status']>(order.status || 'pending');
   const [saving, setSaving] = useState(false);
@@ -41,7 +43,7 @@ export const OrderRow = ({ order }: Props) => {
   };
 
   return (
-    <TableRow className="border-border hover:bg-muted/50 transition-colors">
+    <TableRow className={`border-stone-100 hover:bg-rose-50/30 transition-colors ${className}`}>
       <TableCell className="font-body text-sm">
         {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}
       </TableCell>

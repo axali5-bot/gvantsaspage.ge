@@ -61,14 +61,14 @@ export const ExpensesPanel = () => {
   return (
     <div className="space-y-5">
       {/* Quick-add form */}
-      <div className="border border-border rounded-lg p-4 bg-background">
+      <div className="admin-card p-4">
         <div className="grid grid-cols-2 sm:grid-cols-[130px_110px_1fr_auto] gap-3 items-end">
           <div>
             <Label className="text-xs">კატეგორია</Label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-              className="w-full px-2 py-2 border border-border rounded-sm bg-background text-foreground text-sm"
+              className="w-full px-2 py-2 border border-stone-200 rounded-xl bg-white text-foreground text-sm"
             >
               {(Object.keys(EXPENSE_CATEGORY_LABELS) as ExpenseCategory[]).map((c) => (
                 <option key={c} value={c}>{EXPENSE_CATEGORY_LABELS[c]}</option>
@@ -123,7 +123,7 @@ export const ExpensesPanel = () => {
           {expenses.map((e) => (
             <div
               key={e.id}
-              className="flex items-center gap-3 border border-border rounded-lg px-4 py-2.5 bg-background"
+              className="flex items-center gap-3 admin-card admin-card-hover px-4 py-2.5"
             >
               <span className="text-sm text-muted-foreground tabular-nums w-24 shrink-0">{e.spent_at}</span>
               <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ${CATEGORY_TONE[e.category] ?? CATEGORY_TONE.other}`}>

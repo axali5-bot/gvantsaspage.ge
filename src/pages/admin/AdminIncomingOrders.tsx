@@ -51,7 +51,7 @@ function OrderCard({ order }: { order: IncomingOrder }) {
   };
 
   return (
-    <div className={`bg-background border border-border rounded-sm ${CARD_BORDER[order.status]} p-4 space-y-3`}>
+    <div className={`bg-white border rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,.05),0_4px_12px_rgba(0,0,0,.04)] ${CARD_BORDER[order.status]} p-4 space-y-3`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-0.5">
@@ -169,20 +169,20 @@ export const AdminIncomingOrders = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-3">
-          <h2 className="font-display text-xl">samkaulebi-ის შეკვეთები</h2>
+          <h2 className="font-display text-xl text-stone-800">samkaulebi-ის შეკვეთები</h2>
           {newCount > 0 && (
             <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center">
               {newCount}
             </span>
           )}
         </div>
-        <div className="flex gap-1 border border-border rounded-sm p-0.5">
+        <div className="flex gap-1 bg-stone-100 rounded-xl p-1">
           {(['new', 'all'] as FilterTab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-3 py-1 text-xs rounded-sm transition-colors ${
-                tab === t ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3 py-1 text-xs rounded-lg transition-all ${
+                tab === t ? 'bg-white shadow-sm text-stone-800 font-semibold' : 'text-stone-500 hover:text-stone-800'
               }`}
             >
               {t === 'new' ? `ახალი (${newCount})` : `ყველა (${orders.length})`}

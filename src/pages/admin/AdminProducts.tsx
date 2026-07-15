@@ -68,7 +68,7 @@ export const AdminProducts = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center gap-2 flex-wrap">
-        <h2 className="font-display text-xl">Products ({products.length})</h2>
+        <h2 className="font-display text-xl text-stone-800">Products ({products.length})</h2>
         <div className="flex gap-2 flex-wrap items-center">
           <ProductExportButtons products={products} />
           <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
