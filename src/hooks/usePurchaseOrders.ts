@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
+import type { Json } from '@/types/supabase';
 import { PRODUCT_COSTS_KEY } from '@/hooks/useProductCosts';
 import { SYNC_KEY } from '@/hooks/useSamkaulebiSync';
 
@@ -108,7 +109,7 @@ export const useCreatePurchaseOrder = () => {
         p_campaign: input.campaign ?? null,
         p_ordered_at: input.ordered_at,
         p_note: input.note ?? null,
-        p_items: input.items,
+        p_items: input.items as unknown as Json,
       });
       if (error) throw error;
       return data as string;

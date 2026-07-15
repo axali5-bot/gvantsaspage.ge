@@ -98,9 +98,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (uid && ref) {
           // Attribute a stored ?ref code once signed in (covers Google OAuth signups,
           // where handle_new_user has no referral metadata). RPC is idempotent.
-          supabase.rpc('apply_referral', { p_code: ref })
-            .then(() => { clearStoredReferralCode(); fetchProfile(uid).catch(() => {}); })
-            .catch(() => fetchProfile(uid).catch(() => {}));
+          supabase.rpc('apply_referral', { p_code: ref }).then(
+            () => { clearStoredReferralCode(); fetchProfile(uid).catch(() => {}); },
+            () => fetchProfile(uid).catch(() => {}),
+          );
         } else {
           fetchProfile(uid).catch(() => {});
         }

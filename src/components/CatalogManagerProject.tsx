@@ -80,9 +80,9 @@ const CatalogManagerProject = () => {
     setUploadProgress(0);
     try {
       const fileName = `${brand}-catalog-${Date.now()}.${file.name.split('.').pop()}`;
-      const { error: uploadError } = await supabase.storage.from('catalogs').upload(fileName, file, {
-        onUploadProgress: (p) => setUploadProgress((p.loaded / p.total) * 100),
-      });
+      // supabase-js v2 upload has no progress callback; show indeterminate state.
+      setUploadProgress(50);
+      const { error: uploadError } = await supabase.storage.from('catalogs').upload(fileName, file);
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from('catalogs').getPublicUrl(fileName);
       await handleUpdate(brand, { type: 'pdf', pdf_path: urlData.publicUrl });
@@ -147,7 +147,7 @@ const CatalogManagerProject = () => {
         const isActive = catalog?.is_active ?? true;
 
         return (
-          <div key={brand} className={`bg-card border rounded-sm p-6 space-y-5 relative group/card transition-opacity ${isActive ? 'border-border' : 'border-border opacity-60'}`}>
+          <div key={brand} className={`admin-card p-6 space-y-5 relative group/card transition-opacity ${isActive ? '' : 'opacity-60'}`}>
             {/* Header */}
             <div className="flex justify-between items-center border-b border-border pb-4">
               <div className="flex items-center gap-3">

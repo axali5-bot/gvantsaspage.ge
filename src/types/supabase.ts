@@ -45,6 +45,7 @@ export type Database = {
         Row: {
           brand: string
           id: string
+          is_active: boolean
           pdf_path: string | null
           type: string
           updated_at: string | null
@@ -53,6 +54,7 @@ export type Database = {
         Insert: {
           brand: string
           id?: string
+          is_active?: boolean
           pdf_path?: string | null
           type?: string
           updated_at?: string | null
@@ -61,6 +63,7 @@ export type Database = {
         Update: {
           brand?: string
           id?: string
+          is_active?: boolean
           pdf_path?: string | null
           type?: string
           updated_at?: string | null
@@ -73,6 +76,7 @@ export type Database = {
           created_at: string | null
           icon: string | null
           id: string
+          image_url: string | null
           name_en: string
           name_ka: string
           name_ru: string
@@ -83,6 +87,7 @@ export type Database = {
           created_at?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           name_en: string
           name_ka: string
           name_ru: string
@@ -93,6 +98,7 @@ export type Database = {
           created_at?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           name_en?: string
           name_ka?: string
           name_ru?: string
@@ -108,6 +114,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          spent_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          spent_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          spent_at?: string
+        }
+        Relationships: []
       }
       incoming_orders: {
         Row: {
@@ -144,6 +180,32 @@ export type Database = {
           total_price?: number
         }
         Relationships: []
+      }
+      order_item_costs: {
+        Row: {
+          cost_at_time: number
+          created_at: string
+          order_item_id: string
+        }
+        Insert: {
+          cost_at_time?: number
+          created_at?: string
+          order_item_id: string
+        }
+        Update: {
+          cost_at_time?: number
+          created_at?: string
+          order_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_item_costs_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: true
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -195,6 +257,7 @@ export type Database = {
           customer_name: string | null
           customer_phone: string | null
           id: string
+          points_redeemed: number
           status: string | null
           total_price: number
           user_id: string | null
@@ -206,6 +269,7 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
+          points_redeemed?: number
           status?: string | null
           total_price: number
           user_id?: string | null
@@ -217,11 +281,83 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
+          points_redeemed?: number
           status?: string | null
           total_price?: number
           user_id?: string | null
         }
         Relationships: []
+      }
+      point_transactions: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          order_id: string | null
+          points: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          note?: string | null
+          order_id?: string | null
+          points: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          order_id?: string | null
+          points?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "point_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "point_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_costs: {
+        Row: {
+          cost_price: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          cost_price?: number
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          cost_price?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_costs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -283,6 +419,9 @@ export type Database = {
           id: string
           is_admin: boolean
           phone: string | null
+          points: number
+          referral_code: string
+          referred_by: string | null
           updated_at: string
         }
         Insert: {
@@ -293,6 +432,9 @@ export type Database = {
           id: string
           is_admin?: boolean
           phone?: string | null
+          points?: number
+          referral_code: string
+          referred_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -303,9 +445,209 @@ export type Database = {
           id?: string
           is_admin?: boolean
           phone?: string | null
+          points?: number
+          referral_code?: string
+          referred_by?: string | null
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          line_total: number
+          product_id: string
+          purchase_order_id: string
+          quantity: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_total?: number
+          product_id: string
+          purchase_order_id: string
+          quantity: number
+          unit_cost: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_total?: number
+          product_id?: string
+          purchase_order_id?: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          campaign: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          ordered_at: string
+          status: string
+          supplier: string
+          total_cost: number
+        }
+        Insert: {
+          campaign?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          ordered_at?: string
+          status?: string
+          supplier: string
+          total_cost?: number
+        }
+        Update: {
+          campaign?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          ordered_at?: string
+          status?: string
+          supplier?: string
+          total_cost?: number
+        }
         Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          points_awarded: number
+          qualified_at: string | null
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          qualified_at?: string | null
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          qualified_at?: string | null
+          referred_id?: string
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          reviewer_name: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          rating: number
+          reviewer_name?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          reviewer_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       samkaulebi_sync: {
         Row: {
@@ -342,32 +684,94 @@ export type Database = {
           },
         ]
       }
+      site_visits: {
+        Row: {
+          day: string
+          first_seen: string
+          hits: number
+          last_seen: string
+          visitor_id: string
+        }
+        Insert: {
+          day?: string
+          first_seen?: string
+          hits?: number
+          last_seen?: string
+          visitor_id: string
+        }
+        Update: {
+          day?: string
+          first_seen?: string
+          hits?: number
+          last_seen?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      product_ratings: {
+        Row: {
+          avg_rating: number | null
+          product_id: string | null
+          review_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      create_order:
-        | {
-            Args: {
-              p_customer_address: string
-              p_customer_name: string
-              p_customer_phone: string
-              p_items: Json
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_customer_address: string
-              p_customer_name: string
-              p_customer_phone: string
-              p_items: Json
-              p_user_id?: string
-            }
-            Returns: string
-          }
+      apply_referral: { Args: { p_code: string }; Returns: undefined }
+      check_rate_limit: {
+        Args: { p_key: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      create_order: {
+        Args: {
+          p_customer_address: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_items: Json
+          p_redeem_points?: number
+          p_user_id?: string
+        }
+        Returns: string
+      }
+      create_purchase_order: {
+        Args: {
+          p_campaign: string
+          p_items: Json
+          p_note: string
+          p_ordered_at: string
+          p_supplier: string
+        }
+        Returns: string
+      }
+      generate_referral_code: { Args: never; Returns: string }
+      get_visit_stats: {
+        Args: { p_from?: string }
+        Returns: {
+          day: string
+          visitors: number
+          visits: number
+        }[]
+      }
+      get_visit_totals: {
+        Args: { p_from?: string }
+        Returns: {
+          total_visits: number
+          unique_visitors: number
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
+      record_visit: { Args: { p_visitor_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
