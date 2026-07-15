@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight, Wallet, PiggyBank, Percent, Boxes, AlertTriangle } from 'lucide-react';
+import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight, Wallet, PiggyBank, Percent, Boxes, AlertTriangle, Receipt } from 'lucide-react';
 import { useAnalytics, TimeRange } from '@/hooks/useAnalytics';
 import { useProfitability } from '@/hooks/useProfitability';
 import { KPICard } from '@/components/analytics/KPICard';
@@ -190,7 +190,7 @@ const AdminAnalytics = () => {
           )}
 
           {/* Profit KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <KPICard
               label="თვითღირებულება (COGS)"
               value={`₾${profit.cogs.toFixed(2)}`}
@@ -201,13 +201,19 @@ const AdminAnalytics = () => {
               label="მთლიანი მოგება"
               value={`₾${profit.grossProfit.toFixed(2)}`}
               icon={PiggyBank}
+              hint={`მარჟა ${profit.marginPct.toFixed(1)}%`}
+            />
+            <KPICard
+              label="სხვა ხარჯები"
+              value={`₾${profit.expensesTotal.toFixed(2)}`}
+              icon={Receipt}
               hint={hint}
             />
             <KPICard
-              label="მარჟა"
-              value={`${profit.marginPct.toFixed(1)}%`}
+              label="სუფთა მოგება"
+              value={`₾${profit.netProfit.toFixed(2)}`}
               icon={Percent}
-              hint={hint}
+              hint="მოგება − ხარჯები"
             />
             <KPICard
               label="საწყობის ღირებულება"

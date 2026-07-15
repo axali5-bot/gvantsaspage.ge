@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useOrders } from './useOrders';
 import { useProducts } from './useProducts';
 import { useProductCosts } from './useProductCosts';
+import { useExpenses } from './useExpenses';
 import type { TimeRange } from './useAnalytics';
 
 export interface ProfitPerDayPoint {
@@ -27,6 +28,8 @@ export interface ProfitabilityResult {
   cogs: number;
   grossProfit: number;
   marginPct: number;          // 0–100
+  expensesTotal: number;      // operating expenses inside the range
+  netProfit: number;          // grossProfit − expensesTotal
   inventoryValue: number;     // Σ stock × current cost (products with known cost)
   coveragePct: number;        // 0–100: % of sold units whose cost is known
   profitPerDay: ProfitPerDayPoint[];
@@ -69,8 +72,9 @@ export const useProfitability = (range: TimeRange): ProfitabilityResult => {
   const { data: products = [], isLoading: productsLoading } = useProducts();
   const { data: currentCosts = new Map(), isLoading: costsLoading } = useProductCosts();
   const { data: snapshots = new Map(), isLoading: snapsLoading } = useOrderItemCosts();
+  const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
 
-  const isLoading = ordersLoading || productsLoading || costsLoading || snapsLoading;
+  const isLoading = ordersLoading || productsLoading || costsLoading || snapsLoading || expensesLoading;
 
   const result = useMemo(() => {
     const cutoff = getRangeCutoff(range);
@@ -169,8 +173,18 @@ export const useProfitability = (range: TimeRange): ProfitabilityResult => {
       return sum + (p.stock_quantity ?? 0) * cost;
     }, 0);
 
-    return { cogs, grossProfit, marginPct, inventoryValue, coveragePct, profitPerDay, topByProfit };
-  }, [orders, products, currentCosts, snapshots, range]);
+    // Operating expenses inside the same range → net profit.
+    const expensesTotal = expenses.reduce((sum, e) => {
+      if (cutoff && new Date(e.spent_at) < cutoff) return sum;
+      return sum + e.amount;
+    }, 0);
+    const netProfit = grossProfit - expensesTotal;
+
+    return {
+      cogs, grossProfit, marginPct, expensesTotal, netProfit,
+      inventoryValue, coveragePct, profitPerDay, topByProfit,
+    };
+  }, [orders, products, currentCosts, snapshots, expenses, range]);
 
   return { ...result, isLoading };
 };

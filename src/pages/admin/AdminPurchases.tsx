@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Plus, ChevronDown, ChevronRight, Package, Loader2 } from 'lucide-react';
 import { usePurchaseOrders, usePurchaseOrderItems, PurchaseOrder } from '@/hooks/usePurchaseOrders';
 import { PurchaseFormDialog } from '@/components/admin/PurchaseFormDialog';
+import { ExpensesPanel } from '@/components/admin/ExpensesPanel';
 
 const fmt = (n: number) => n.toLocaleString('ka-GE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -75,33 +77,46 @@ export const AdminPurchases = () => {
 
   return (
     <div className="space-y-5">
-      <div className="flex justify-between items-center gap-2 flex-wrap">
-        <div>
-          <h2 className="font-display text-xl">შესყიდვები</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            სულ {orders.length} შესყიდვა · ხარჯი <span className="font-medium text-foreground">{fmt(totalSpend)} ₾</span>
-          </p>
-        </div>
-        <Button size="sm" onClick={() => setCreateOpen(true)}>
-          <Plus size={14} className="mr-1" /> ახალი შესყიდვა
-        </Button>
-      </div>
+      <Tabs defaultValue="purchases">
+        <TabsList>
+          <TabsTrigger value="purchases">შესყიდვები</TabsTrigger>
+          <TabsTrigger value="expenses">სხვა ხარჯები</TabsTrigger>
+        </TabsList>
 
-      {isLoading ? (
-        <p className="text-muted-foreground py-8">იტვირთება…</p>
-      ) : orders.length === 0 ? (
-        <div className="border border-dashed border-border rounded-lg py-16 text-center">
-          <Package size={32} className="mx-auto text-muted-foreground/50 mb-3" />
-          <p className="text-muted-foreground">ჯერ არცერთი შესყიდვა არ არის დაფიქსირებული.</p>
-          <p className="text-sm text-muted-foreground/70 mt-1">
-            დაამატე პირველი ბლუკ-შესყიდვა Avon / Oriflame-დან.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {orders.map((po) => <PurchaseCard key={po.id} po={po} />)}
-        </div>
-      )}
+        <TabsContent value="purchases" className="space-y-5 mt-5">
+          <div className="flex justify-between items-center gap-2 flex-wrap">
+            <div>
+              <h2 className="font-display text-xl">შესყიდვები</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                სულ {orders.length} შესყიდვა · ხარჯი <span className="font-medium text-foreground">{fmt(totalSpend)} ₾</span>
+              </p>
+            </div>
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus size={14} className="mr-1" /> ახალი შესყიდვა
+            </Button>
+          </div>
+
+          {isLoading ? (
+            <p className="text-muted-foreground py-8">იტვირთება…</p>
+          ) : orders.length === 0 ? (
+            <div className="border border-dashed border-border rounded-lg py-16 text-center">
+              <Package size={32} className="mx-auto text-muted-foreground/50 mb-3" />
+              <p className="text-muted-foreground">ჯერ არცერთი შესყიდვა არ არის დაფიქსირებული.</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">
+                დაამატე პირველი ბლუკ-შესყიდვა Avon / Oriflame-დან.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {orders.map((po) => <PurchaseCard key={po.id} po={po} />)}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="expenses" className="mt-5">
+          <ExpensesPanel />
+        </TabsContent>
+      </Tabs>
 
       <PurchaseFormDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
