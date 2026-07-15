@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Package, ShoppingBag, Tags, BookOpen, BarChart3, Store, Users } from 'lucide-react';
+import { ArrowLeft, Package, ShoppingBag, Tags, BookOpen, BarChart3, Store, Users, Truck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabaseClient';
@@ -12,6 +12,7 @@ import { playNotificationBeep } from '@/lib/notificationSound';
 const navItems = [
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/products', label: 'Products', icon: Package },
+  { to: '/admin/purchases', label: 'Purchases', icon: Truck },
   { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { to: '/admin/customers', label: 'Customers', icon: Users },
   { to: '/admin/categories', label: 'Categories', icon: Tags },

@@ -33,6 +33,7 @@ const CustomerOrders = lazy(() => import("./pages/CustomerOrders"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminPurchases = lazy(() => import("./pages/admin/AdminPurchases"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminCatalogs = lazy(() => import("./pages/admin/AdminCatalogs"));
@@ -79,6 +80,9 @@ const App = () => (
                     } />
                     <Route path="/admin/products" element={
                       <Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>
+                    } />
+                    <Route path="/admin/purchases" element={
+                      <Suspense fallback={<AdminFallback />}><AdminPurchases /></Suspense>
                     } />
                     <Route path="/admin/orders" element={
                       <Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>
