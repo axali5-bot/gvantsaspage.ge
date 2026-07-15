@@ -1,5 +1,5 @@
 import type React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -27,6 +27,7 @@ const itemVariants: Variants = {
 
 export const HeroSection = () => {
   const { t } = useTranslation();
+  const [videoReady, setVideoReady] = useState(false);
 
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
@@ -39,13 +40,21 @@ export const HeroSection = () => {
     <section className="relative w-full min-h-screen overflow-hidden flex items-center bg-gradient-to-br from-rose-50 via-white to-pink-100 text-slate-900">
       {/* Background video */}
       <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Poster image — shows instantly; the video fades in over it, so the
+            first load reads as a gentle transition instead of an abrupt swap. */}
+        <img
+          src="/images/blush-perfume.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover"
+        />
         <video
           autoPlay
           muted
           loop
           playsInline
-          poster="/images/blush-perfume.png"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover"
+          onCanPlay={() => setVideoReady(true)}
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover transition-opacity duration-1000 ease-out ${videoReady ? 'opacity-100' : 'opacity-0'}`}
         >
           <source src="/videos/hero-video.mp4" type="video/mp4" />
         </video>
