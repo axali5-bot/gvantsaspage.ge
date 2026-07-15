@@ -9,6 +9,7 @@ import { Upload, X, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabaseClient';
 import { useCreateProduct, useUpdateProduct, Product, ProductInput } from '@/hooks/useProducts';
+import { useProductCosts, useUpsertProductCost } from '@/hooks/useProductCosts';
 import { syncProduct } from '@/lib/samkaulebiSync';
 import { useInvalidateSyncMap } from '@/hooks/useSamkaulebiSync';
 import { Category } from '@/hooks/useCategories';
@@ -24,6 +25,11 @@ const formSchema = z.object({
   description_en: z.string().optional(),
   description_ru: z.string().optional(),
   price: z.number({ invalid_type_error: "Price must be a number" }).positive('Price must be greater than 0'),
+  // Wholesale/purchase cost — stored in the admin-only product_costs table.
+  cost_price: z.preprocess(
+    (v) => (v === '' || v === null || v === undefined || Number.isNaN(v) ? 0 : v),
+    z.number().min(0, 'Cost cannot be negative'),
+  ).default(0),
   parent_category_id: z.string().optional(),
   category_id: z.string().optional(),
   stock_quantity: z.number().int().min(0, 'Stock cannot be negative').default(0),
@@ -53,6 +59,8 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const invalidateSyncMap = useInvalidateSyncMap();
+  const { data: productCosts = new Map() } = useProductCosts();
+  const upsertCost = useUpsertProductCost();
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -70,6 +78,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
       description_en: '',
       description_ru: '',
       price: 0,
+      cost_price: 0,
       parent_category_id: '',
       category_id: '',
       stock_quantity: 0,
@@ -94,6 +103,7 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
         description_en: product.description_en || '',
         description_ru: product.description_ru || '',
         price: product.price || 0,
+        cost_price: productCosts.get(product.id) ?? 0,
         parent_category_id: parentId,
         category_id: childId,
         stock_quantity: product.stock_quantity || 0,
@@ -106,7 +116,13 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
       setImageFile(null);
       setImagePreview(null);
     }
-  }, [open, product, categories, reset]);
+  }, [open, product, categories, productCosts, reset]);
+
+  // Live margin preview as the admin types price/cost.
+  const mPrice = Number(watch('price')) || 0;
+  const mCost = Number(watch('cost_price')) || 0;
+  const mMargin = mPrice - mCost;
+  const mPct = mPrice > 0 ? Math.round((mMargin / mPrice) * 100) : 0;
 
   const copyFromGeorgian = (lang: 'en' | 'ru') => () => {
     const kaName = watch('name_ka');
@@ -182,8 +198,10 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
         gender: values.gender,
       };
 
+      let savedId: string;
       if (isEdit && product) {
         const updated = await updateProduct.mutateAsync({ id: product.id, patch: input });
+        savedId = product.id;
         toast.success('Product updated successfully');
         // fire-and-forget sync — non-blocking, result shown via badge refresh
         syncProduct({ ...updated, image_url: updated.image_url ?? null }).then((r) => {
@@ -191,10 +209,19 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
         });
       } else {
         const created = await createProduct.mutateAsync(input);
+        savedId = created.id;
         toast.success('Product added successfully');
         syncProduct({ ...created, image_url: created.image_url ?? null }).then((r) => {
           if (r.ok) invalidateSyncMap();
         });
+      }
+
+      // Persist wholesale cost separately (admin-only table). Secondary to the
+      // product save — a failure here must not lose the product itself.
+      try {
+        await upsertCost.mutateAsync({ product_id: savedId, cost_price: values.cost_price ?? 0 });
+      } catch {
+        toast.warning('თვითღირებულება ვერ შეინახა — სცადე ხელახლა რედაქტირებით');
       }
 
       onOpenChange(false);
@@ -282,6 +309,25 @@ export const ProductFormDialog = ({ open, onOpenChange, product, categories }: P
               <Label>Stock</Label>
               <Input type="number" {...register('stock_quantity', { valueAsNumber: true })} />
               {errors.stock_quantity && <p className="text-destructive text-xs mt-1">{errors.stock_quantity.message}</p>}
+            </div>
+          </div>
+
+          {/* Wholesale cost + live margin (admin-only, never shown on the storefront) */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>შესყიდვის ფასი (₾)</Label>
+              <Input type="number" step="0.01" {...register('cost_price', { valueAsNumber: true })} />
+              <p className="text-[11px] text-muted-foreground mt-1">🔒 კონფიდენციალური — საიტზე არ ჩანს</p>
+            </div>
+            <div>
+              <Label>მოგება (მარჟა)</Label>
+              <div
+                className={`h-10 flex items-center px-3 rounded-md border border-border bg-muted/30 text-sm font-medium ${
+                  mCost > 0 ? (mMargin >= 0 ? 'text-emerald-600' : 'text-destructive') : 'text-muted-foreground'
+                }`}
+              >
+                {mCost > 0 ? `${mMargin >= 0 ? '+' : ''}${mMargin.toFixed(2)} ₾ · ${mPct}%` : '—'}
+              </div>
             </div>
           </div>
 

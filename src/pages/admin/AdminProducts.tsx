@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProducts, Product } from '@/hooks/useProducts';
+import { useProductCosts } from '@/hooks/useProductCosts';
 import { useCategories } from '@/hooks/useCategories';
 import { useSamkaulebiSync, SYNC_KEY } from '@/hooks/useSamkaulebiSync';
 import { syncProduct } from '@/lib/samkaulebiSync';
@@ -26,6 +27,7 @@ export const AdminProducts = () => {
   const { data: products = [], isLoading } = useProducts();
   const { data: categories = [] } = useCategories();
   const { data: syncMap = new Map() } = useSamkaulebiSync();
+  const { data: costMap = new Map() } = useProductCosts();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
@@ -121,6 +123,7 @@ export const AdminProducts = () => {
         selected={selected}
         onSelectionChange={setSelected}
         syncMap={syncMap}
+        costMap={costMap}
       />
 
       <ProductFormDialog

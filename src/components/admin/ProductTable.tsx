@@ -19,6 +19,8 @@ interface Props {
   selected: Set<string>;
   onSelectionChange: (selected: Set<string>) => void;
   syncMap?: SyncMap;
+  /** product_id → wholesale cost (₾), for the margin column. Admin-only. */
+  costMap?: Map<string, number>;
 }
 
 function SyncBadge({ status, error }: { status?: string; error?: string | null }) {
@@ -31,7 +33,20 @@ function SyncBadge({ status, error }: { status?: string; error?: string | null }
   return null;
 }
 
-export const ProductTable = ({ products, onEdit, onDelete, selected, onSelectionChange, syncMap }: Props) => {
+function MarginCell({ price, cost }: { price: number; cost?: number }) {
+  if (cost == null || cost <= 0) {
+    return <span className="text-xs text-muted-foreground" title="შესყიდვის ფასი არ არის შეყვანილი">—</span>;
+  }
+  const margin = price - cost;
+  const pct = price > 0 ? Math.round((margin / price) * 100) : 0;
+  return (
+    <span className={`font-medium ${margin >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+      {margin >= 0 ? '+' : ''}{margin.toFixed(0)} ₾ · {pct}%
+    </span>
+  );
+}
+
+export const ProductTable = ({ products, onEdit, onDelete, selected, onSelectionChange, syncMap, costMap }: Props) => {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('name_ka');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -58,6 +73,8 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paged = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // checkbox, image, name, price, margin, stock, gender, [sync], actions
+  const colCount = 8 + (syncMap ? 1 : 0);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) { setSortDir((d) => (d === 'asc' ? 'desc' : 'asc')); }
@@ -112,6 +129,7 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                   Price {sortIcon('price')}
                 </button>
               </TableHead>
+              <TableHead>Margin</TableHead>
               <TableHead>
                 <button className="flex items-center font-semibold" onClick={() => toggleSort('stock_quantity')}>
                   Stock {sortIcon('stock_quantity')}
@@ -125,7 +143,7 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
           <TableBody>
             {paged.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={colCount} className="text-center py-12 text-muted-foreground">
                   {search ? 'No products match your search.' : 'No products yet.'}
                 </TableCell>
               </TableRow>
@@ -144,6 +162,9 @@ export const ProductTable = ({ products, onEdit, onDelete, selected, onSelection
                   </TableCell>
                   <TableCell className="font-body font-medium">{product.name_ka}</TableCell>
                   <TableCell className="font-body">{product.price} ₾</TableCell>
+                  <TableCell className="font-body">
+                    <MarginCell price={product.price} cost={costMap?.get(product.id)} />
+                  </TableCell>
                   <TableCell className="font-body">{product.stock_quantity ?? 0}</TableCell>
                   <TableCell className="font-body text-xs text-muted-foreground">{product.gender || '—'}</TableCell>
                   {syncMap && (
