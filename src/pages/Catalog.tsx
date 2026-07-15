@@ -84,8 +84,12 @@ const Catalog = () => {
         fetchCatalogs();
     }, []);
 
-    const avon = catalogs.find(c => c.brand === 'avon');
-    const oriflame = catalogs.find(c => c.brand === 'oriflame');
+    // Render avon first, oriflame second, any future brand after — data-driven,
+    // not hard-coded to two, so a new catalog brand appears automatically.
+    const brandOrder: Record<string, number> = { avon: 0, oriflame: 1 };
+    const sortedCatalogs = [...catalogs].sort(
+        (a, b) => (brandOrder[a.brand] ?? 99) - (brandOrder[b.brand] ?? 99),
+    );
 
     const renderCatalogCard = (catalog: CatalogData | undefined, brandName: string) => {
         if (!catalog) return null;
@@ -94,6 +98,8 @@ const Catalog = () => {
         const isFlipbook = catalog.type === 'flipbook';
         const isPdf = catalog.type === 'pdf';
         const link = isPdf ? catalog.pdf_path : catalog.url;
+        // Use the flipbook's first page as a real cover image — no extra assets.
+        const coverImage = isFlipbook && pages.length > 0 ? pages[0].image_url : null;
 
         // Don't render an empty card — nothing to show the customer
         const hasContent =
@@ -127,13 +133,20 @@ const Catalog = () => {
 
         // Brand-specific styling
         const isAvon = brandName === 'avon';
+        const isOriflame = brandName === 'oriflame';
         const gradientClass = isAvon
             ? 'from-rose-400 via-pink-500 to-amber-500'
             : 'from-blue-400 via-indigo-500 to-purple-600';
-        const brandTitle = isAvon ? t('catalog.avon') : t('catalog.oriflame');
+        const brandTitle = isAvon
+            ? t('catalog.avon')
+            : isOriflame
+            ? t('catalog.oriflame')
+            : brandName.toUpperCase();
         const brandDescription = isAvon
             ? "აღმოაჩინეთ უახლესი არომატების და სილამაზის კოლექციები Avon-დან"
-            : "გაეცანით შვედურ სილამაზის და ველნეს პროდუქტებს Oriflame-დან";
+            : isOriflame
+            ? "გაეცანით შვედურ სილამაზის და ველნეს პროდუქტებს Oriflame-დან"
+            : "";
 
         return (
             <motion.div
@@ -144,8 +157,14 @@ const Catalog = () => {
             >
                 {/* Cover Card */}
                 <div className="glass-morphism rounded-3xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/20">
-                    {/* Gradient Cover Section */}
-                    <div className={`relative h-72 md:h-96 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
+                    {/* Cover — real flipbook page-1 image when available, else brand gradient */}
+                    <div className={`relative h-72 md:h-96 overflow-hidden ${coverImage ? 'bg-neutral-900' : `bg-gradient-to-br ${gradientClass}`}`}>
+                        {coverImage && (
+                            <>
+                                <img src={coverImage} alt={brandName} className="absolute inset-0 h-full w-full object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-black/25" />
+                            </>
+                        )}
                         {/* Animated Pattern Overlay */}
                         <div className="absolute inset-0 opacity-20">
                             <div className="absolute inset-0" style={{
@@ -293,8 +312,9 @@ const Catalog = () => {
                     </div>
                 ) : (
                     <div className="space-y-12">
-                        {renderCatalogCard(avon, 'avon')}
-                        {renderCatalogCard(oriflame, 'oriflame')}
+                        {sortedCatalogs.map((c) => (
+                            <div key={c.brand}>{renderCatalogCard(c, c.brand)}</div>
+                        ))}
                     </div>
                 )}
             </main>
@@ -306,7 +326,7 @@ const Catalog = () => {
                         AVON2FLAME
                     </p>
                     <p className="font-body text-xs text-muted-foreground tracking-wide">
-                        © 2024 All Rights Reserved
+                        © {new Date().getFullYear()} All Rights Reserved
                     </p>
                 </div>
             </footer>
