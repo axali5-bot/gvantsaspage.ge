@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, FolderOpen } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Pencil, Trash2, FolderOpen, Upload, X } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,16 @@ import {
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory, Category } from '@/hooks/useCategories';
 import { toast } from 'sonner';
 
+// Same public bucket the product images use (admin-only insert policy covers it).
+async function uploadCategoryImage(file: File): Promise<string> {
+  const ext = file.name.split('.').pop();
+  const fileName = `category-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+  const { error } = await supabase.storage.from('products').upload(fileName, file);
+  if (error) throw new Error(`Upload failed: ${error.message}`);
+  const { data } = supabase.storage.from('products').getPublicUrl(fileName);
+  return data.publicUrl;
+}
+
 const CategoryManager = () => {
   const { data: categories = [], isLoading: loading } = useCategories();
   const createCategory = useCreateCategory();
@@ -50,9 +61,35 @@ const CategoryManager = () => {
   });
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  // Image state: a newly picked file, and what to show in the preview box.
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
     setFormData({ name_ka: '', name_en: '', name_ru: '', slug: '', parent_id: '' });
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  /** Resolve the image_url to save: new upload wins; cleared preview means null. */
+  const resolveImageUrl = async (): Promise<string | null> => {
+    if (imageFile) return await uploadCategoryImage(imageFile);
+    return imagePreview; // untouched existing URL, or null when cleared/never set
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -64,12 +101,14 @@ const CategoryManager = () => {
 
     setSaving(true);
     try {
+      const imageUrl = await resolveImageUrl();
       await createCategory.mutateAsync({
         name_ka: formData.name_ka,
         name_en: formData.name_en,
         name_ru: formData.name_ru,
         slug: formData.slug,
         parent_id: formData.parent_id || null,
+        image_url: imageUrl,
       });
       toast.success('Category added successfully');
       setAddOpen(false);
@@ -90,6 +129,8 @@ const CategoryManager = () => {
       slug: category.slug || '',
       parent_id: category.parent_id || ''
     });
+    setImageFile(null);
+    setImagePreview(category.image_url || null);
     setEditOpen(true);
   };
 
@@ -102,6 +143,7 @@ const CategoryManager = () => {
 
     setSaving(true);
     try {
+      const imageUrl = await resolveImageUrl();
       await updateCategoryMutation.mutateAsync({
         id: editingCategory.id,
         patch: {
@@ -110,6 +152,7 @@ const CategoryManager = () => {
           name_ru: formData.name_ru,
           slug: formData.slug,
           parent_id: formData.parent_id || null,
+          image_url: imageUrl,
         },
       });
       toast.success('Category updated successfully');
@@ -211,6 +254,38 @@ const CategoryManager = () => {
             }
           </select>
         </div>
+
+        {/* Category photo — drives the homepage "დაათვალიერე კატეგორიები" tile */}
+        <div>
+          <Label>Category Photo (Optional)</Label>
+          <div className="mt-2">
+            {imagePreview ? (
+              <div className="relative w-full h-32 rounded border border-border overflow-hidden">
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={clearImage}
+                  className="absolute top-2 right-2 p-1 bg-background/80 rounded-full hover:bg-background"
+                  aria-label="Remove photo"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-32 border-2 border-dashed border-border rounded flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+              >
+                <Upload size={22} className="text-muted-foreground mb-2" />
+                <span className="text-sm text-muted-foreground">Click to upload photo</span>
+              </div>
+            )}
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            <p className="text-[11px] text-muted-foreground mt-1.5">
+              მთავარ გვერდზე კატეგორიის ფილას ფონად გამოჩნდება. თუ არ ატვირთავ — ავტომატურად პროდუქტის ფოტო აისახება.
+            </p>
+          </div>
+        </div>
       </div>
     </>
   );
@@ -305,6 +380,7 @@ const CategoryManager = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="font-body w-14">Photo</TableHead>
               <TableHead className="font-body">Name (KA)</TableHead>
               <TableHead className="font-body">Parent</TableHead>
               <TableHead className="font-body">Slug</TableHead>
@@ -327,6 +403,13 @@ const CategoryManager = () => {
                 const parent = category.parent_id ? categories.find(c => c.id === category.parent_id) : null;
                 return (
                   <TableRow key={category.id}>
+                    <TableCell>
+                      {category.image_url ? (
+                        <img src={category.image_url} alt={category.name_ka} className="w-9 h-9 object-cover rounded" />
+                      ) : (
+                        <div className="w-9 h-9 bg-muted rounded" />
+                      )}
+                    </TableCell>
                     <TableCell className="font-body font-medium">
                       <div className="flex items-center gap-2">
                         {category.parent_id && <span className="text-muted-foreground">↳</span>}

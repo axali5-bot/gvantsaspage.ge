@@ -9,6 +9,7 @@ export interface Category {
   slug: string;
   parent_id?: string | null;
   icon?: string | null;
+  image_url?: string | null;
 }
 
 export interface CategoryInput {
@@ -17,6 +18,7 @@ export interface CategoryInput {
   name_ru: string;
   slug: string;
   parent_id?: string | null;
+  image_url?: string | null;
 }
 
 const CATEGORIES_KEY = ['categories'] as const;

@@ -77,14 +77,14 @@ const Index = () => {
     selectedCategory ? categories.filter(c => c.parent_id === selectedCategory) : []
     , [categories, selectedCategory]);
 
-  // Photo tiles for the "Shop by Category" showcase — each borrows the newest
-  // product image in that top-level category (no extra assets needed).
+  // Photo tiles for the "Shop by Category" showcase — the category's own photo
+  // wins; otherwise borrow the newest product image in that top-level category.
   const categoryTiles = useMemo<CategoryTile[]>(() =>
     parentCategories.map((cat) => {
       const rep = products.find(
         (p) => topCategoryId(p.category_id, categories) === cat.id && p.image_url,
       );
-      return { id: cat.id, name: cat.name_ka, image: rep?.image_url ?? null };
+      return { id: cat.id, name: cat.name_ka, image: cat.image_url ?? rep?.image_url ?? null };
     }), [parentCategories, products, categories]);
 
   const scrollToProducts = () => {
