@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +26,7 @@ import { ProtectedCustomerRoute } from "./components/ProtectedCustomerRoute";
 import "@/i18n";
 import ChatWidget from "./components/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop";
+import { recordVisit } from "./lib/visitTracker";
 
 const Account = lazy(() => import("./pages/Account"));
 const CustomerOrders = lazy(() => import("./pages/CustomerOrders"));
@@ -48,7 +49,10 @@ const AdminFallback = () => (
   </div>
 );
 
-const App = () => (
+const App = () => {
+  useEffect(() => { recordVisit(); }, []);
+
+  return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -132,6 +136,7 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>
-);
+  );
+};
 
 export default App;

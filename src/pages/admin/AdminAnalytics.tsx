@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight, Wallet, PiggyBank, Percent, Boxes, AlertTriangle, Receipt } from 'lucide-react';
+import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight, Wallet, PiggyBank, Percent, Boxes, AlertTriangle, Receipt, Users, Eye, CalendarDays } from 'lucide-react';
 import { useAnalytics, TimeRange } from '@/hooks/useAnalytics';
 import { useProfitability } from '@/hooks/useProfitability';
+import { useVisitors } from '@/hooks/useVisitors';
 import { KPICard } from '@/components/analytics/KPICard';
 import { TimeRangePills } from '@/components/analytics/TimeRangePills';
 import { RevenueChart } from '@/components/analytics/RevenueChart';
 import { ProfitChart } from '@/components/analytics/ProfitChart';
+import { VisitorsChart } from '@/components/analytics/VisitorsChart';
 import { StatusBreakdown } from '@/components/analytics/StatusBreakdown';
 import { TopProductsList } from '@/components/analytics/TopProductsList';
 import { TopProfitList } from '@/components/analytics/TopProfitList';
@@ -42,6 +44,7 @@ const AdminAnalytics = () => {
     refetch,
   } = useAnalytics(range);
   const profit = useProfitability(range);
+  const visitors = useVisitors(range);
 
   const hint = RANGE_LABELS[range];
 
@@ -102,6 +105,39 @@ const AdminAnalytics = () => {
           </span>
         </h2>
         <TimeRangePills value={range} onChange={setRange} />
+      </div>
+
+      {/* ── Visitors (independent of orders — always visible) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 lg:grid-cols-1 gap-4 lg:col-span-1">
+          <KPICard
+            label="უნიკალური ვიზიტორი"
+            value={String(visitors.uniqueVisitors)}
+            icon={Users}
+            hint={hint}
+          />
+          <KPICard
+            label="ვიზიტი"
+            value={String(visitors.totalVisits)}
+            icon={Eye}
+            hint={hint}
+          />
+          <KPICard
+            label="დღეს"
+            value={String(visitors.todayVisitors)}
+            icon={CalendarDays}
+            hint="უნიკალური ვიზიტორი"
+          />
+        </div>
+        <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
+          <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+            ვიზიტორები დღეების მიხედვით
+          </h3>
+          <VisitorsChart
+            data={visitors.visitorsPerDay}
+            empty={visitors.totalVisits === 0}
+          />
+        </div>
       </div>
 
       {noOrders ? (
