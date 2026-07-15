@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight } from 'lucide-react';
+import { Banknote, ShoppingBag, TrendingUp, Star, Bell, ChevronRight, Wallet, PiggyBank, Percent, Boxes, AlertTriangle } from 'lucide-react';
 import { useAnalytics, TimeRange } from '@/hooks/useAnalytics';
+import { useProfitability } from '@/hooks/useProfitability';
 import { KPICard } from '@/components/analytics/KPICard';
 import { TimeRangePills } from '@/components/analytics/TimeRangePills';
 import { RevenueChart } from '@/components/analytics/RevenueChart';
+import { ProfitChart } from '@/components/analytics/ProfitChart';
 import { StatusBreakdown } from '@/components/analytics/StatusBreakdown';
 import { TopProductsList } from '@/components/analytics/TopProductsList';
+import { TopProfitList } from '@/components/analytics/TopProfitList';
 import { StockAlerts } from '@/components/analytics/StockAlerts';
 
 const RANGE_LABELS: Record<TimeRange, string> = {
@@ -38,6 +41,7 @@ const AdminAnalytics = () => {
     isError,
     refetch,
   } = useAnalytics(range);
+  const profit = useProfitability(range);
 
   const hint = RANGE_LABELS[range];
 
@@ -164,6 +168,69 @@ const AdminAnalytics = () => {
               Top Products by Revenue
             </h3>
             <TopProductsList products={topProducts} />
+          </div>
+
+          {/* ── Profitability (მოგება) ── */}
+          <div className="flex items-center gap-3 pt-4">
+            <h2 className="font-display text-xl">მოგება</h2>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
+          {/* Trust banner: profit is only as good as the cost data behind it */}
+          {profit.coveragePct < 100 && (
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-sm px-4 py-3">
+              <AlertTriangle size={15} className="text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-800 leading-relaxed">
+                თვითღირებულება ცნობილია გაყიდული ერთეულების{' '}
+                <span className="font-semibold">{profit.coveragePct.toFixed(0)}%</span>-ზე — მოგება
+                რეალურზე მაღალი ჩანს. შეავსე შესყიდვის ფასები (Products ✏️ ან Purchases-ით) და ეს
+                მაჩვენებელი დაზუსტდება.
+              </p>
+            </div>
+          )}
+
+          {/* Profit KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <KPICard
+              label="თვითღირებულება (COGS)"
+              value={`₾${profit.cogs.toFixed(2)}`}
+              icon={Wallet}
+              hint={hint}
+            />
+            <KPICard
+              label="მთლიანი მოგება"
+              value={`₾${profit.grossProfit.toFixed(2)}`}
+              icon={PiggyBank}
+              hint={hint}
+            />
+            <KPICard
+              label="მარჟა"
+              value={`${profit.marginPct.toFixed(1)}%`}
+              icon={Percent}
+              hint={hint}
+            />
+            <KPICard
+              label="საწყობის ღირებულება"
+              value={`₾${profit.inventoryValue.toFixed(2)}`}
+              icon={Boxes}
+              hint="მარაგი × თვითღირებულება"
+            />
+          </div>
+
+          {/* Profit chart + top-by-profit */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 border border-border rounded-sm p-5 bg-background">
+              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+                შემოსავალი vs მოგება
+              </h3>
+              <ProfitChart data={profit.profitPerDay} empty={profit.profitPerDay.length === 0} />
+            </div>
+            <div className="border border-border rounded-sm p-5 bg-background">
+              <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+                ტოპ პროდუქტები მოგებით
+              </h3>
+              <TopProfitList products={profit.topByProfit} />
+            </div>
           </div>
         </>
       )}
