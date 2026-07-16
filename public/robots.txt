@@ -1,8 +1,23 @@
+# AVON2FLAME — crawler policy.
+# Search engines that bring customers are welcome; heavy SEO/AI scrapers that
+# burn edge-request quota (see the kalegroup 970k incident) are not.
+
+# --- Welcome: search & social preview bots ---
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+
+User-agent: Yandex
+Allow: /
+Disallow: /admin
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /admin
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +25,49 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# --- Blocked: aggressive SEO-tool crawlers (they respect robots.txt) ---
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: serpstatbot
+Disallow: /
+
+User-agent: ZoominfoBot
+Disallow: /
+
+# --- Blocked: high-volume AI/content scrapers ---
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# --- Everyone else: allowed but slowed down, and kept out of the admin ---
 User-agent: *
 Allow: /
+Disallow: /admin
+Crawl-delay: 10
