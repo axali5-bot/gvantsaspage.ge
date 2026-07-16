@@ -20,6 +20,14 @@ interface CategoryShowcaseProps {
 export const CategoryShowcase = ({ tiles, selected, onSelect }: CategoryShowcaseProps) => {
   if (tiles.length === 0) return null;
 
+  // Up to 4 tiles share one row on desktop (2×2 on mobile); fewer tiles keep
+  // the older, wider layout. Full class names so Tailwind can compile them.
+  const gridCols =
+    tiles.length >= 4 ? 'grid-cols-2 md:grid-cols-4'
+    : tiles.length === 3 ? 'grid-cols-1 sm:grid-cols-3'
+    : tiles.length === 2 ? 'grid-cols-2'
+    : 'grid-cols-1 max-w-xs mx-auto';
+
   return (
     <section className="container max-w-6xl mx-auto px-4 pt-12 md:pt-16">
       <div className="flex items-center justify-center gap-3 mb-8">
@@ -30,10 +38,7 @@ export const CategoryShowcase = ({ tiles, selected, onSelect }: CategoryShowcase
         <span className="h-px w-8 bg-[#D4AF37]/40" />
       </div>
 
-      <div
-        className="grid gap-3 md:gap-4"
-        style={{ gridTemplateColumns: `repeat(${Math.min(tiles.length, 3)}, minmax(0, 1fr))` }}
-      >
+      <div className={`grid gap-3 md:gap-4 ${gridCols}`}>
         {tiles.map((tile, i) => {
           const isActive = selected === tile.id;
           return (
